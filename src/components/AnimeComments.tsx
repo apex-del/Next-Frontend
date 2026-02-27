@@ -45,7 +45,7 @@ export default function AnimeComments({ animeId }: AnimeCommentsProps) {
   const { data: comments = [], isLoading } = useQuery({
     queryKey: ["comments", animeId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("comments")
         .select("*")
         .eq("anime_id", animeId)
@@ -63,7 +63,7 @@ export default function AnimeComments({ animeId }: AnimeCommentsProps) {
     queryKey: ["comment_reactions", animeId, commentIds],
     queryFn: async () => {
       if (commentIds.length === 0) return [];
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("comment_reactions")
         .select("*")
         .in("comment_id", commentIds);
@@ -89,12 +89,12 @@ export default function AnimeComments({ animeId }: AnimeCommentsProps) {
       const existing = reactions.find((r) => r.comment_id === commentId && r.user_id === user.id);
       if (existing) {
         if (existing.reaction_type === type) {
-          await supabase.from("comment_reactions").delete().eq("id", existing.id);
+          await (supabase as any).from("comment_reactions").delete().eq("id", existing.id);
         } else {
-          await supabase.from("comment_reactions").update({ reaction_type: type }).eq("id", existing.id);
+          await (supabase as any).from("comment_reactions").update({ reaction_type: type }).eq("id", existing.id);
         }
       } else {
-        await supabase.from("comment_reactions").insert({
+        await (supabase as any).from("comment_reactions").insert({
           comment_id: commentId,
           user_id: user.id,
           reaction_type: type,
@@ -110,7 +110,7 @@ export default function AnimeComments({ animeId }: AnimeCommentsProps) {
     mutationFn: async (text: string) => {
       if (!user) throw new Error("Not authenticated");
       const displayName = user.user_metadata?.display_name || user.email?.split("@")[0] || "User";
-      const { error } = await supabase.from("comments").insert({
+      const { error } = await (supabase as any).from("comments").insert({
         user_id: user.id,
         anime_id: animeId,
         content: text.trim(),
@@ -130,7 +130,7 @@ export default function AnimeComments({ animeId }: AnimeCommentsProps) {
 
   const deleteComment = useMutation({
     mutationFn: async (commentId: string) => {
-      const { error } = await supabase.from("comments").delete().eq("id", commentId);
+      const { error } = await (supabase as any).from("comments").delete().eq("id", commentId);
       if (error) throw error;
     },
     onSuccess: () => {
