@@ -1,9 +1,0 @@
-name = "anime-down"
-compatibility_date = "2024-09-23"
-
-[build]
-cwd = "."
-command = "npm run build"
-
-[site]
-bucket = ".next"
