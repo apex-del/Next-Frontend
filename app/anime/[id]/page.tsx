@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import AnimeDetailsClient from "./AnimeDetailsClient";
 import { getAnimeById } from "@/lib/jikan";
 
+export const runtime = 'edge';
+
 interface Props {
   params: Promise<{ id: string }>;
 }
