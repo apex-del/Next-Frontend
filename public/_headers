@@ -1,6 +1,3 @@
-https://anime-down.pages.dev/*
+/*
   X-NEXT-INTL-COOKIE-PREF: *
   X-Rewrite-URL: /
-
-https://anime-down.pages.dev/api/*
-  Proxy: https://anime-stream-api.anonymous-0709200.workers.dev/api/*
