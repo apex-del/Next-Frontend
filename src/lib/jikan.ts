@@ -1,4 +1,4 @@
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL || "";
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL || "https://anime-stream-api.anonymous-0709200.workers.dev";
 const JIKAN_API = "https://api.jikan.moe/v4";
 
 const useWorker = !!WORKER_URL;
