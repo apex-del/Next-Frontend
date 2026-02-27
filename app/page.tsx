@@ -3,6 +3,7 @@
 import Layout from "@/components/Layout";
 import HeroSection from "@/components/HeroSection";
 import AnimeRow from "@/components/AnimeRow";
+import LeaderboardGrid from "@/components/LeaderboardGrid";
 import { useTopAnime, useSeasonNow } from "@/hooks/useAnime";
 
 export default function HomePage() {
@@ -10,6 +11,7 @@ export default function HomePage() {
   const { data: airingData, isLoading: airingLoading } = useTopAnime("airing");
   const { data: popularData, isLoading: popularLoading } = useTopAnime("bypopularity");
   const { data: seasonData, isLoading: seasonLoading } = useSeasonNow();
+  const { data: favoriteData, isLoading: favoriteLoading } = useTopAnime("favorite");
 
   const heroAnime = topData?.data || [];
 
@@ -44,6 +46,18 @@ export default function HomePage() {
           title="🏆 Top Rated"
           animeList={topData?.data || []}
           isLoading={topLoading}
+        />
+
+        <LeaderboardGrid
+          title="Popular Leaderboard"
+          animeList={popularData?.data || []}
+          isLoading={popularLoading}
+        />
+
+        <LeaderboardGrid
+          title="Fan Favorites"
+          animeList={favoriteData?.data || []}
+          isLoading={favoriteLoading}
         />
       </div>
     </Layout>
