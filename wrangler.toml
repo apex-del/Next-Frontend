@@ -1,4 +1,9 @@
 name = "anime-stream-pages"
 compatibility_date = "2024-09-23"
 
-pages_build_output_dir = ".next"
+[pages]
+command = "npm run build"
+compatibility_flags = ["nodejs_compat"]
+
+[pages.build]
+upload_dir = ".next"
