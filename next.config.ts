@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import { withCloudflare } from "@cloudflare/next-on-pages/next-config";
 
 const nextConfig: NextConfig = {
   images: {
@@ -55,4 +54,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withCloudflare(nextConfig);
+export default nextConfig;
