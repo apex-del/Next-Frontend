@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "deploy": "npx wrangler pages deploy .next --project-name anime-stream-next",
+    "deploy": "npx wrangler pages deploy .next --project-name anime-down",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
