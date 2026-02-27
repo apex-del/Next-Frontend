@@ -32,14 +32,12 @@ export default function AnimeCharacters({ animeId }: { animeId: number }) {
   const [showAllOpen, setShowAllOpen] = useState(false);
   const [page, setPage] = useState(1);
 
-  const apiBase = WORKER_URL;
+const apiBase = WORKER_URL;
 
   const { data, isLoading } = useQuery({
     queryKey: ["anime-characters", animeId],
     queryFn: async () => {
-      const endpoint = useWorker 
-        ? `/api/anime/${animeId}/characters` 
-        : `/anime/${animeId}/characters`;
+      const endpoint = `/api/anime/${animeId}/characters`;
       const res = await fetch(`${apiBase}${endpoint}`);
       if (!res.ok) throw new Error("Failed");
       return res.json() as Promise<{ data: Character[] }>;

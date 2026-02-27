@@ -22,9 +22,7 @@ export default function RelatedAnime({ animeId }: RelatedAnimeProps) {
   const { data } = useQuery({
     queryKey: ["anime-relations", animeId],
     queryFn: async () => {
-      const endpoint = useWorker 
-        ? `/api/anime/${animeId}/relations` 
-        : `/anime/${animeId}/relations`;
+      const endpoint = `/api/anime/${animeId}/relations`;
       const res = await fetch(`${apiBase}${endpoint}`);
       if (!res.ok) throw new Error("Failed");
       return res.json() as Promise<{ data: Relation[] }>;
