@@ -4,13 +4,8 @@ import { useState } from "react";
 import { MessageSquare, Send, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import Layout from "@/components/Layout";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
-);
 
 export default function Contact() {
   const { user } = useAuth();

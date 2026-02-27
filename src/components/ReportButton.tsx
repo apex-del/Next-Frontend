@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Flag, Send, CheckCircle, X } from "lucide-react";
-import { createClient } from "@supabase/supabase-js";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
   DialogContent,
@@ -9,11 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
-const supabaseReports = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
-);
 
 interface ReportButtonProps {
   animeId: number;
@@ -31,7 +26,7 @@ export default function ReportButton({ animeId, animeTitle, episodeNumber }: Rep
   const handleSubmit = async () => {
     if (loading) return;
     setLoading(true);
-    await supabaseReports.from("reports").insert({
+    await supabase.from("reports").insert({
       user_id: user?.id || null,
       anime_id: animeId,
       anime_title: animeTitle,
