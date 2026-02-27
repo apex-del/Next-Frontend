@@ -96,9 +96,7 @@ export async function getTopAnime(
 ): Promise<JikanResponse<JikanAnime[]>> {
   const params = new URLSearchParams({ page: String(page), limit: "20" });
   if (filter) params.set("filter", filter);
-  const endpoint = useWorker 
-    ? `/api/top?${params}` 
-    : `/top/anime?${params}`;
+  const endpoint = `/api/top?${params}`;
   const res = await rateLimitedFetch(`${BASE_URL}${endpoint}`);
   return res.json();
 }
@@ -107,9 +105,7 @@ export async function getSeasonNow(
   page = 1
 ): Promise<JikanResponse<JikanAnime[]>> {
   const params = new URLSearchParams({ page: String(page), limit: "20" });
-  const endpoint = useWorker 
-    ? `/api/seasons/now?${params}` 
-    : `/seasons/now?${params}`;
+  const endpoint = `/api/seasons/now?${params}`;
   const res = await rateLimitedFetch(`${BASE_URL}${endpoint}`);
   return res.json();
 }
@@ -132,9 +128,7 @@ export async function searchAnime(
   if (status) params.set("status", status);
   if (orderBy) params.set("order_by", orderBy);
   if (sort) params.set("sort", sort);
-  const endpoint = useWorker 
-    ? `/api/search?${params}` 
-    : `/anime?${params}`;
+  const endpoint = `/api/search?${params}`;
   const res = await rateLimitedFetch(`${BASE_URL}${endpoint}`);
   return res.json();
 }
@@ -142,9 +136,7 @@ export async function searchAnime(
 export async function getAnimeById(
   id: number
 ): Promise<JikanResponse<JikanAnime>> {
-  const endpoint = useWorker 
-    ? `/api/anime/${id}/full` 
-    : `/anime/${id}/full`;
+  const endpoint = `/api/anime/${id}/full`;
   const res = await rateLimitedFetch(`${BASE_URL}${endpoint}`);
   return res.json();
 }
@@ -154,9 +146,7 @@ export async function getAnimeEpisodes(
   page = 1
 ): Promise<JikanResponse<JikanEpisode[]>> {
   const params = new URLSearchParams({ page: String(page) });
-  const endpoint = useWorker 
-    ? `/api/anime/${id}/episodes?${params}` 
-    : `/anime/${id}/episodes?${params}`;
+  const endpoint = `/api/anime/${id}/episodes?${params}`;
   const res = await rateLimitedFetch(`${BASE_URL}${endpoint}`);
   return res.json();
 }
@@ -164,9 +154,7 @@ export async function getAnimeEpisodes(
 export async function getAnimeRecommendations(
   id: number
 ): Promise<JikanResponse<Array<{ entry: JikanAnime }>>> {
-  const endpoint = useWorker 
-    ? `/api/anime/${id}/recommendations` 
-    : `/anime/${id}/recommendations`;
+  const endpoint = `/api/anime/${id}/recommendations`;
   const res = await rateLimitedFetch(`${BASE_URL}${endpoint}`);
   return res.json();
 }
@@ -174,7 +162,7 @@ export async function getAnimeRecommendations(
 export async function getGenres(): Promise<
   JikanResponse<Array<{ mal_id: number; name: string; count: number }>>
 > {
-  const endpoint = useWorker ? `/api/genres` : `/genres/anime`;
+  const endpoint = `/api/genres`;
   const res = await rateLimitedFetch(`${BASE_URL}${endpoint}`);
   return res.json();
 }
