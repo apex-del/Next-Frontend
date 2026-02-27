@@ -1,0 +1,11 @@
+name = "anime-stream-hub"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+pages_build_output_dir = ".next"
+
+[env.production]
+name = "anime-stream-hub-prod"
+
+[env.production.pages]
+pages_build_output_dir = ".next"

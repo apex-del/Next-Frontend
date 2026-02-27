@@ -1,0 +1,33 @@
+name = "anime-stream-api"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+name = "anime-stream-api-prod"
+
+[[kv_namespaces]]
+binding = "ANIME_CACHE"
+id = "your-cache-namespace-id"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "anime-stream"
+database_id = "your-database-id"
+
+[vars]
+SUPABASE_URL = "https://your-project.supabase.co"
+SUPABASE_KEY = "your-supabase-anon-key"
+
+[env.production.kv_namespaces]
+binding = "ANIME_CACHE"
+id = "your-prod-cache-id"
+
+[env.production.d1_databases]
+binding = "DB"
+database_name = "anime-stream"
+database_id = "your-prod-database-id"
+
+[env.production.vars]
+SUPABASE_URL = "https://your-project.supabase.co"
+SUPABASE_KEY = "your-supabase-anon-key"
