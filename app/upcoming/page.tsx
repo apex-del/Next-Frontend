@@ -7,6 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 import Layout from "@/components/Layout";
 import AnimeCard from "@/components/AnimeCard";
 
+const WORKER_URL = "https://anime-stream-api.anonymous-0709200.workers.dev";
+
 export default function Upcoming() {
   const [page, setPage] = useState(1);
 
@@ -14,7 +16,7 @@ export default function Upcoming() {
     queryKey: ["upcoming-anime", page],
     queryFn: async () => {
       const res = await fetch(
-        `https://api.jikan.moe/v4/seasons/upcoming?page=${page}&limit=24`
+        `${WORKER_URL}/api/seasons/upcoming?page=${page}&limit=24`
       );
       if (!res.ok) throw new Error("Failed");
       return res.json();

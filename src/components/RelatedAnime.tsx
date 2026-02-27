@@ -13,12 +13,11 @@ interface RelatedAnimeProps {
   animeId: number;
 }
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL || "";
-const useWorker = !!WORKER_URL;
+const WORKER_URL = "https://anime-stream-api.anonymous-0709200.workers.dev";
 const JIKAN_API = "https://api.jikan.moe/v4";
 
 export default function RelatedAnime({ animeId }: RelatedAnimeProps) {
-  const apiBase = useWorker ? WORKER_URL : JIKAN_API;
+  const apiBase = WORKER_URL;
 
   const { data } = useQuery({
     queryKey: ["anime-relations", animeId],

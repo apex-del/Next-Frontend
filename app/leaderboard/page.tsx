@@ -13,6 +13,8 @@ const categories = [
   { key: "characters", label: "Top Characters", icon: Users },
 ] as const;
 
+const WORKER_URL = "https://anime-stream-api.anonymous-0709200.workers.dev";
+
 export default function Leaderboard() {
   const [category, setCategory] = useState<string>("anime");
   const [page, setPage] = useState(1);
@@ -21,8 +23,8 @@ export default function Leaderboard() {
     queryKey: ["leaderboard", category, page],
     queryFn: async () => {
       const endpoint = category === "characters"
-        ? `https://api.jikan.moe/v4/top/characters?page=${page}&limit=25`
-        : `https://api.jikan.moe/v4/top/${category}?page=${page}&limit=25`;
+        ? `${WORKER_URL}/api/top/characters?page=${page}&limit=25`
+        : `${WORKER_URL}/api/top/${category}?page=${page}&limit=25`;
       const res = await fetch(endpoint);
       if (!res.ok) throw new Error("Failed");
       return res.json();

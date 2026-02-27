@@ -25,15 +25,14 @@ interface Character {
 }
 
 const CHARACTERS_PER_PAGE = 12;
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL || "";
-const useWorker = !!WORKER_URL;
+const WORKER_URL = "https://anime-stream-api.anonymous-0709200.workers.dev";
 const JIKAN_API = "https://api.jikan.moe/v4";
 
 export default function AnimeCharacters({ animeId }: { animeId: number }) {
   const [showAllOpen, setShowAllOpen] = useState(false);
   const [page, setPage] = useState(1);
 
-  const apiBase = useWorker ? WORKER_URL : JIKAN_API;
+  const apiBase = WORKER_URL;
 
   const { data, isLoading } = useQuery({
     queryKey: ["anime-characters", animeId],

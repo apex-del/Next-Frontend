@@ -9,6 +9,7 @@ import AnimeCard from "@/components/AnimeCard";
 import SkeletonCard from "@/components/SkeletonCard";
 
 const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+const WORKER_URL = "https://anime-stream-api.anonymous-0709200.workers.dev";
 
 export default function Schedule() {
   const today = DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
@@ -17,7 +18,7 @@ export default function Schedule() {
   const { data, isLoading } = useQuery({
     queryKey: ["schedule", selectedDay],
     queryFn: async () => {
-      const res = await fetch(`https://api.jikan.moe/v4/schedules?filter=${selectedDay}&limit=24`);
+      const res = await fetch(`${WORKER_URL}/api/schedules?filter=${selectedDay}&limit=24`);
       if (!res.ok) throw new Error("Failed to fetch schedule");
       return res.json();
     },

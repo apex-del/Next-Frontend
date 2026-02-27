@@ -7,6 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 import Layout from "@/components/Layout";
 import Link from "next/link";
 
+const WORKER_URL = "https://anime-stream-api.anonymous-0709200.workers.dev";
+
 export default function Studios() {
   const [page, setPage] = useState(1);
 
@@ -14,7 +16,7 @@ export default function Studios() {
     queryKey: ["producers", page],
     queryFn: async () => {
       const res = await fetch(
-        `https://api.jikan.moe/v4/producers?page=${page}&limit=24&order_by=favorites&sort=desc`
+        `${WORKER_URL}/api/producers?page=${page}&limit=24&order_by=favorites&sort=desc`
       );
       if (!res.ok) throw new Error("Failed");
       return res.json();

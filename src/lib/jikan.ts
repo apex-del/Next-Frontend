@@ -1,8 +1,6 @@
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL || "https://anime-stream-api.anonymous-0709200.workers.dev";
+const WORKER_URL = "https://anime-stream-api.anonymous-0709200.workers.dev";
 const JIKAN_API = "https://api.jikan.moe/v4";
-
-const useWorker = !!WORKER_URL;
-const BASE_URL = useWorker ? WORKER_URL : JIKAN_API;
+const BASE_URL = WORKER_URL;
 
 export interface JikanAnime {
   mal_id: number;

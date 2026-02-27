@@ -9,11 +9,13 @@ import SkeletonCard from "@/components/SkeletonCard";
 import { useQuery } from "@tanstack/react-query";
 import type { JikanAnime } from "@/lib/jikan";
 
+const WORKER_URL = "https://anime-stream-api.anonymous-0709200.workers.dev";
+
 async function fetchRandomAnime(): Promise<JikanAnime[]> {
   const results: JikanAnime[] = [];
   for (let i = 0; i < 6; i++) {
     await new Promise((r) => setTimeout(r, 350));
-    const res = await fetch("https://api.jikan.moe/v4/random/anime");
+    const res = await fetch(`${WORKER_URL}/api/random/anime`);
     if (res.ok) {
       const json = await res.json();
       if (json.data) results.push(json.data);
