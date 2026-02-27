@@ -1,3 +1,9 @@
-name = "anime-stream-next"
+name = "anime-down"
 compatibility_date = "2024-09-23"
-pages_build_output_dir = ".next"
+
+[build]
+cwd = "."
+command = "npm run build"
+
+[site]
+bucket = ".next"
