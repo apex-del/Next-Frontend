@@ -310,7 +310,7 @@ function CommentReportButton({ commentId }: { commentId: string }) {
   const handleSubmit = async () => {
     if (loading) return;
     setLoading(true);
-    await supabase.from("reports").insert({
+    await (supabase as any).from("reports").insert({
       user_id: user?.id || null,
       report_type: "comment",
       message: `Comment ID: ${commentId}. ${message.trim() || "Reported comment"}`,

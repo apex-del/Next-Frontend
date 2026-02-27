@@ -26,7 +26,7 @@ export default function ReportButton({ animeId, animeTitle, episodeNumber }: Rep
   const handleSubmit = async () => {
     if (loading) return;
     setLoading(true);
-    await supabase.from("reports").insert({
+    await (supabase as any).from("reports").insert({
       user_id: user?.id || null,
       anime_id: animeId,
       anime_title: animeTitle,

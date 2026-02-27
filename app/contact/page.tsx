@@ -18,7 +18,7 @@ export default function Contact() {
     e.preventDefault();
     if (!message.trim()) return;
     setLoading(true);
-    await supabase.from("reports").insert({
+    await (supabase as any).from("reports").insert({
       user_id: user?.id || null,
       report_type: type,
       message: message.trim(),
