@@ -9,9 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "deploy": "npm run build && npx @cloudflare/next-on-pages",
-    "deploy:worker": "cd worker && wrangler deploy",
-    "deploy:worker:prod": "cd worker && wrangler deploy --env production"
+    "deploy": "npx @cloudflare/next-on-pages"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
