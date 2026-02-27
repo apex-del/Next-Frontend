@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "deploy": "next build && npx @cloudflare/next-on-pages"
+    "deploy": "next build && npx @cloudflare/next-on-pages --deploy"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
