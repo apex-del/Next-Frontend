@@ -31,26 +31,19 @@ export default function HomePage() {
           isLoading={airingLoading}
         />
 
-        <AnimeRow
+        <PopularTopGrid
           title="📺 This Season"
           animeList={seasonData?.data || []}
           isLoading={seasonLoading}
         />
 
-        <AnimeRow
+        <PopularTopGrid
           title="⭐ Most Popular"
           animeList={popularData?.data || []}
           isLoading={popularLoading}
         />
 
         <PopularTopGrid
-          title="🔥 Most Popular & Top Rated"
-          popularAnime={popularData?.data || []}
-          topRatedAnime={topData?.data || []}
-          isLoading={popularLoading || topLoading}
-        />
-
-        <AnimeRow
           title="🏆 Top Rated"
           animeList={topData?.data || []}
           isLoading={topLoading}

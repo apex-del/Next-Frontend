@@ -8,14 +8,11 @@ import { getDisplayTitle } from "@/lib/jikan";
 
 interface PopularTopGridProps {
   title: string;
-  popularAnime: JikanAnime[];
-  topRatedAnime: JikanAnime[];
+  animeList: JikanAnime[];
   isLoading?: boolean;
 }
 
-export default function PopularTopGrid({ title, popularAnime, topRatedAnime, isLoading }: PopularTopGridProps) {
-  const displayAnime = [...popularAnime.slice(0, 6), ...topRatedAnime.slice(0, 6)];
-
+export default function PopularTopGrid({ title, animeList, isLoading }: PopularTopGridProps) {
   if (isLoading) {
     return (
       <section className="py-8">
@@ -24,7 +21,7 @@ export default function PopularTopGrid({ title, popularAnime, topRatedAnime, isL
             <Star className="h-5 w-5 text-primary" />
             {title}
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {Array.from({ length: 12 }).map((_, i) => (
               <div key={i} className="aspect-[3/4] rounded-lg bg-card animate-pulse" />
             ))}
@@ -50,8 +47,8 @@ export default function PopularTopGrid({ title, popularAnime, topRatedAnime, isL
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {displayAnime.map((anime, i) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          {animeList.slice(0, 12).map((anime, i) => (
             <motion.div
               key={anime.mal_id}
               initial={{ opacity: 0, y: 20 }}
