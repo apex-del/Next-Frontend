@@ -4,6 +4,7 @@ import Layout from "@/components/Layout";
 import HeroSection from "@/components/HeroSection";
 import AnimeRow from "@/components/AnimeRow";
 import LeaderboardGrid from "@/components/LeaderboardGrid";
+import PopularTopGrid from "@/components/PopularTopGrid";
 import { useTopAnime, useSeasonNow } from "@/hooks/useAnime";
 
 export default function HomePage() {
@@ -40,6 +41,13 @@ export default function HomePage() {
           title="⭐ Most Popular"
           animeList={popularData?.data || []}
           isLoading={popularLoading}
+        />
+
+        <PopularTopGrid
+          title="🔥 Most Popular & Top Rated"
+          popularAnime={popularData?.data || []}
+          topRatedAnime={topData?.data || []}
+          isLoading={popularLoading || topLoading}
         />
 
         <AnimeRow
