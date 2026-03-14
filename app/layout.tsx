@@ -15,13 +15,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://your-domain.com",
+    url: "https://animestream.com",
     siteName: "AnimeStream",
     title: "AnimeStream - Watch Anime Online",
     description: "Stream and download your favorite anime shows.",
     images: [
       {
-        url: "/og-image.png",
+        url: "https://animestream.com/og-image.png",
         width: 1200,
         height: 630,
         alt: "AnimeStream",
@@ -32,7 +32,10 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "AnimeStream - Watch Anime Online",
     description: "Stream and download your favorite anime shows.",
-    images: ["/og-image.png"],
+    images: ["https://animestream.com/og-image.png"],
+  },
+  alternates: {
+    canonical: "https://animestream.com",
   },
   robots: {
     index: true,
