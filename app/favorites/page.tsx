@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/hooks/useAuth";
 import { useFavorites } from "@/hooks/useFavorites";
+import { makeAnimeSlug } from "@/lib/slug";
 
 export default function FavoritesPage() {
   const { user } = useAuth();
@@ -59,7 +60,7 @@ export default function FavoritesPage() {
                   transition={{ delay: i * 0.05 }}
                 >
                   <div className="group relative overflow-hidden rounded-lg bg-card transition-all duration-300 card-glow hover:card-glow-hover hover:scale-[1.03]">
-                    <Link href={`/anime/${fav.anime_id}`}>
+                    <Link href={`/anime/${makeAnimeSlug(fav.anime_title, fav.anime_id)}`}>
                       <div className="relative aspect-[3/4] overflow-hidden">
                         <img
                           src={fav.anime_image}

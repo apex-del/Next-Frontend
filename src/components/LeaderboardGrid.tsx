@@ -5,6 +5,7 @@ import { Star, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
 import type { JikanAnime } from "@/lib/jikan";
 import { getDisplayTitle } from "@/lib/jikan";
+import { makeAnimeSlug } from "@/lib/slug";
 
 interface LeaderboardGridProps {
   title: string;
@@ -47,7 +48,7 @@ export default function LeaderboardGrid({ title, animeList, isLoading }: Leaderb
               transition={{ delay: i * 0.03 }}
             >
               <Link
-                href={`/anime/${anime.mal_id}`}
+                href={`/anime/${makeAnimeSlug(getDisplayTitle(anime), anime.mal_id)}`}
                 className="flex items-center gap-3 rounded-lg bg-card border border-border p-3 transition-all hover:border-primary/30 hover:bg-surface-hover group"
               >
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-bold">

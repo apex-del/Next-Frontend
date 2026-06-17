@@ -6,6 +6,7 @@ import { Play, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { JikanAnime } from "@/lib/jikan";
 import { getDisplayTitle, getBannerImage } from "@/lib/jikan";
+import { makeAnimeSlug } from "@/lib/slug";
 
 interface HeroSectionProps {
   animeList: JikanAnime[];
@@ -109,7 +110,7 @@ export default function HeroSection({ animeList }: HeroSectionProps) {
               {/* Actions */}
               <div className="flex items-center gap-3">
                 <Link
-                  href={`/anime/${anime.mal_id}`}
+                  href={`/anime/${makeAnimeSlug(getDisplayTitle(anime), anime.mal_id)}`}
                   className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:scale-105 active:scale-95"
                 >
                   <Play className="h-5 w-5 fill-current" />

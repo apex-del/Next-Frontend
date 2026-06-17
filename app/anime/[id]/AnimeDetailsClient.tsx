@@ -12,6 +12,7 @@ import {
   ArrowLeft,
   Download,
   Heart,
+  Play,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Layout from "@/components/Layout";
@@ -35,6 +36,10 @@ import AnimeStats from "@/components/AnimeStats";
 import AnimeCharacters from "@/components/AnimeCharacters";
 import AnimeComments from "@/components/AnimeComments";
 import RelatedAnime from "@/components/RelatedAnime";
+import AnimeStatusFlag from "@/components/AnimeStatusFlag";
+import ShareButton from "@/components/ShareButton";
+import PopularLeaderboard from "@/components/PopularLeaderboard";
+import { useRouter } from "next/navigation";
 
 interface AnimeDetailsClientProps {
   animeId: number;
@@ -44,6 +49,7 @@ export default function AnimeDetailsClient({ animeId }: AnimeDetailsClientProps)
   const [synopsisExpanded, setSynopsisExpanded] = useState(false);
   const [episodePage, setEpisodePage] = useState(1);
   const { user } = useAuth();
+  const router = useRouter();
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
 
   const { data: animeData, isLoading } = useAnimeById(animeId);
@@ -131,35 +137,60 @@ export default function AnimeDetailsClient({ animeId }: AnimeDetailsClientProps)
             transition={{ delay: 0.1 }}
             className="flex-1 pt-4 md:pt-8"
           >
-            <div className="flex items-start justify-between gap-4 mb-3">
-              <h1 className="text-2xl md:text-4xl font-extrabold leading-tight">
-                {getDisplayTitle(anime)}
-              </h1>
-              {user && (
-                <button
-                  onClick={() =>
-                    isFavorite(anime.mal_id)
-                      ? removeFavorite.mutate(anime.mal_id)
-                      : addFavorite.mutate(anime)
-                  }
-                  className={`shrink-0 p-2.5 rounded-lg border transition-all ${
-                    isFavorite(anime.mal_id)
-                      ? "bg-primary/15 border-primary/30 text-primary"
-                      : "bg-secondary border-border text-muted-foreground hover:text-primary hover:border-primary/30"
-                  }`}
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-2xl md:text-4xl font-extrabold leading-tight">
+                  {getDisplayTitle(anime)}
+                </h1>
+                {anime.title_japanese && (
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {anime.title_japanese}
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col items-end gap-2 shrink-0">
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => router.push(`/watch/${anime.mal_id}?ep=1`)}
+                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs sm:text-sm font-bold text-primary-foreground bg-gradient-to-r from-primary to-primary/80 shadow-md shadow-primary/30 hover:shadow-primary/50 transition-all"
                 >
-                  <Heart
-                    className={`h-5 w-5 ${isFavorite(anime.mal_id) ? "fill-primary" : ""}`}
+                  <Play className="h-3.5 w-3.5 fill-current" />
+                  Watch
+                </motion.button>
+                <div className="flex items-center gap-1.5">
+                  <AnimeStatusFlag
+                    animeId={anime.mal_id}
+                    animeTitle={getDisplayTitle(anime)}
+                    animeImage={anime.images.webp.large_image_url}
                   />
-                </button>
-              )}
+                  {user && (
+                    <button
+                      onClick={() =>
+                        isFavorite(anime.mal_id)
+                          ? removeFavorite.mutate(anime.mal_id)
+                          : addFavorite.mutate(anime)
+                      }
+                      className={`p-2 rounded-lg border transition-all ${
+                        isFavorite(anime.mal_id)
+                          ? "bg-primary/15 border-primary/30 text-primary"
+                          : "bg-secondary border-border text-muted-foreground hover:text-primary hover:border-primary/30"
+                      }`}
+                      aria-label="Favorite"
+                    >
+                      <Heart
+                        className={`h-4 w-4 ${isFavorite(anime.mal_id) ? "fill-primary" : ""}`}
+                      />
+                    </button>
+                  )}
+                  <ShareButton
+                    variant="icon"
+                    title={getDisplayTitle(anime)}
+                    text={`Check out ${getDisplayTitle(anime)} on AnimeStream`}
+                  />
+                </div>
+              </div>
             </div>
-
-            {anime.title_japanese && (
-              <p className="text-sm text-muted-foreground mb-3">
-                {anime.title_japanese}
-              </p>
-            )}
 
             <div className="flex flex-wrap items-center gap-2 mb-4">
               {anime.score && (
@@ -262,6 +293,19 @@ export default function AnimeDetailsClient({ animeId }: AnimeDetailsClientProps)
                 </button>
               </div>
             )}
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => router.push(`/watch/${anime.mal_id}?ep=1`)}
+              className="group relative inline-flex items-center justify-center gap-3 rounded-xl px-6 sm:px-8 py-3 sm:py-3.5 font-bold text-sm sm:text-base text-primary-foreground shadow-lg shadow-primary/30 transition-all overflow-hidden bg-gradient-to-r from-primary via-primary to-primary/80 hover:shadow-xl hover:shadow-primary/50 w-full sm:w-auto sm:max-w-xs"
+            >
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <span className="relative flex items-center justify-center h-7 w-7 rounded-full bg-white/20 backdrop-blur">
+                <Play className="h-4 w-4 fill-current ml-0.5" />
+              </span>
+              <span className="relative">Watch Now</span>
+            </motion.button>
           </motion.div>
         </div>
 
@@ -287,7 +331,7 @@ export default function AnimeDetailsClient({ animeId }: AnimeDetailsClientProps)
             </div>
           ) : episodes.length > 0 ? (
             <>
-              <div className="space-y-2">
+              <div className="max-h-[480px] overflow-y-auto rounded-xl border border-border bg-card/40 p-2 sm:p-3 space-y-2">
                 {episodes.map((ep) => (
                   <EpisodeCard
                     key={ep.mal_id}
@@ -329,7 +373,7 @@ export default function AnimeDetailsClient({ animeId }: AnimeDetailsClientProps)
           )}
         </motion.section>
 
-        <AnimeTrailer youtubeId={anime.trailer?.youtube_id} title={getDisplayTitle(anime)} />
+        <AnimeTrailer youtubeId={anime.trailer?.youtube_id} title={getDisplayTitle(anime)} malId={anime.mal_id} />
         <AnimeCharacters animeId={anime.mal_id} />
         <AnimeStats anime={anime} />
 
@@ -353,6 +397,10 @@ export default function AnimeDetailsClient({ animeId }: AnimeDetailsClientProps)
             </div>
           </section>
         )}
+
+        <div className="mt-12 pb-12">
+          <PopularLeaderboard variant="block" excludeId={animeId} />
+        </div>
       </div>
     </Layout>
   );

@@ -4,10 +4,10 @@ import {
   getSeasonNow,
   searchAnime,
   getAnimeById,
-  getAnimeEpisodes,
   getAnimeRecommendations,
   getGenres,
 } from "@/lib/jikan";
+import { getEpisodesTrio } from "@/lib/animeData";
 
 export function useTopAnime(
   filter: "airing" | "upcoming" | "bypopularity" | "favorite" | "" = "",
@@ -34,11 +34,12 @@ export function useSearchAnime(
   genres?: string,
   status?: string,
   orderBy?: string,
-  sort?: string
+  sort?: string,
+  type?: string
 ) {
   return useQuery({
-    queryKey: ["search-anime", query, page, genres, status, orderBy, sort],
-    queryFn: () => searchAnime(query, page, genres, status, orderBy, sort),
+    queryKey: ["search-anime", query, page, genres, status, orderBy, sort, type],
+    queryFn: () => searchAnime(query, page, genres, status, orderBy, sort, type),
     staleTime: 3 * 60 * 1000,
     enabled: true,
   });
@@ -55,8 +56,8 @@ export function useAnimeById(id: number) {
 
 export function useAnimeEpisodes(id: number, page = 1) {
   return useQuery({
-    queryKey: ["anime-episodes", id, page],
-    queryFn: () => getAnimeEpisodes(id, page),
+    queryKey: ["anime-episodes-trio", id, page],
+    queryFn: () => getEpisodesTrio(id, page),
     staleTime: 10 * 60 * 1000,
     enabled: !!id,
   });

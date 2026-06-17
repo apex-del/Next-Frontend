@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Home,
@@ -20,6 +20,13 @@ import {
   MessageSquare,
   Info,
   Bookmark,
+  Tv,
+  Clapperboard,
+  Disc,
+  Radio,
+  Music,
+  Star,
+  User,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -48,7 +55,17 @@ const mainNav = [
   { title: "Random", href: "/random", icon: Shuffle },
 ];
 
+const typeNav = [
+  { title: "TV Series", href: "/browse?type=tv", icon: Tv },
+  { title: "Movies", href: "/browse?type=movie", icon: Clapperboard },
+  { title: "OVA", href: "/browse?type=ova", icon: Disc },
+  { title: "ONA", href: "/browse?type=ona", icon: Radio },
+  { title: "Specials", href: "/browse?type=special", icon: Star },
+  { title: "Music", href: "/browse?type=music", icon: Music },
+];
+
 const userNav = [
+  { title: "Profile", href: "/profile", icon: User },
   { title: "Favorites", href: "/favorites", icon: Heart },
   { title: "Watch List", href: "/watchlist", icon: Bookmark },
   { title: "History", href: "/history", icon: Clock },
@@ -64,9 +81,11 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
 
   const isActive = (path: string) => pathname === path;
+  const fullPath = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : "");
 
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
@@ -99,6 +118,28 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     asChild
                     isActive={isActive(item.href)}
+                    tooltip={item.title}
+                  >
+                    <Link href={item.href}>
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Types</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {typeNav.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={fullPath === item.href}
                     tooltip={item.title}
                   >
                     <Link href={item.href}>
@@ -159,7 +200,10 @@ export function AppSidebar() {
 
       <SidebarFooter className="p-3">
         {user ? (
-          <div className={`flex items-center gap-3 rounded-lg bg-sidebar-accent p-2.5 ${collapsed ? "justify-center" : ""}`}>
+          <Link
+            href="/profile"
+            className={`flex items-center gap-3 rounded-lg bg-sidebar-accent p-2.5 hover:bg-sidebar-accent/80 transition-colors ${collapsed ? "justify-center" : ""}`}
+          >
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground text-sm font-bold">
               {user.email?.[0]?.toUpperCase() || "U"}
             </div>
@@ -168,9 +212,10 @@ export function AppSidebar() {
                 <p className="text-xs font-medium text-sidebar-foreground truncate">
                   {user.email}
                 </p>
+                <p className="text-[10px] text-muted-foreground">View profile</p>
               </div>
             )}
-          </div>
+          </Link>
         ) : (
           <SidebarMenu>
             <SidebarMenuItem>

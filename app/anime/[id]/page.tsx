@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import AnimeDetailsClient from "./AnimeDetailsClient";
 import { getAnimeById } from "@/lib/jikan";
+import { parseSlugId } from "@/lib/slug";
 
 export const runtime = 'edge';
 
@@ -11,12 +12,10 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const animeId = Number(id);
+  const { id: animeId } = parseSlugId(id);
 
-  if (isNaN(animeId)) {
-    return {
-      title: "Anime Not Found",
-    };
+  if (!animeId) {
+    return { title: "Anime Not Found" };
   }
 
   try {
@@ -24,9 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const anime = animeData.data;
 
     if (!anime) {
-      return {
-        title: "Anime Not Found",
-      };
+      return { title: "Anime Not Found" };
     }
 
     const title = anime.title_english || anime.title;
@@ -37,49 +34,36 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       anime.images.webp.large_image_url || anime.images.jpg.large_image_url;
 
     return {
-      title: title,
-      description: description,
+      title,
+      description,
       openGraph: {
         title: `${title} | AnimeStream`,
-        description: description,
+        description,
         type: "website",
         url: `/anime/${anime.mal_id}`,
-        images: [
-          {
-            url: imageUrl,
-            width: 800,
-            height: 1200,
-            alt: title,
-          },
-        ],
+        images: [{ url: imageUrl, width: 800, height: 1200, alt: title }],
       },
       twitter: {
         card: "summary_large_image",
         title: `${title} | AnimeStream`,
-        description: description,
+        description,
         images: [imageUrl],
       },
       alternates: {
         canonical: `/anime/${anime.mal_id}`,
       },
-      other: {
-        "og:site_name": "AnimeStream",
-      },
+      other: { "og:site_name": "AnimeStream" },
     };
-  } catch (error) {
-    return {
-      title: "Anime Details",
-    };
+  } catch {
+    return { title: "Anime Details" };
   }
 }
 
 export default async function AnimeDetailsPage({ params }: Props) {
   const { id } = await params;
-  const animeId = Number(id);
+  const { id: animeId } = parseSlugId(id);
 
-  if (isNaN(animeId)) {
-    notFound();
-  }
+  if (!animeId) notFound();
 
   return <AnimeDetailsClient animeId={animeId} />;
 }

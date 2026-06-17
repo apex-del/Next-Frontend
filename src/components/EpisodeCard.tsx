@@ -1,3 +1,5 @@
+"use client";
+
 import { Download, Calendar } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { JikanEpisode } from "@/lib/jikan";

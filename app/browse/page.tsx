@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense, useCallback } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { motion } from "framer-motion";
 import Layout from "@/components/Layout";
@@ -25,15 +25,39 @@ const sortOptions = [
   { value: "popularity", label: "Popularity" },
 ];
 
+const typeOptions = [
+  { value: "", label: "All Types" },
+  { value: "tv", label: "TV" },
+  { value: "movie", label: "Movie" },
+  { value: "ova", label: "OVA" },
+  { value: "ona", label: "ONA" },
+  { value: "special", label: "Special" },
+  { value: "music", label: "Music" },
+];
+
+const TYPE_LABELS: Record<string, string> = {
+  tv: "TV Series",
+  movie: "Movies",
+  ova: "OVA",
+  ona: "ONA",
+  special: "Specials",
+  music: "Music",
+};
+
 function BrowseContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const initialQuery = searchParams.get("q") || "";
+  const initialType = searchParams.get("type") || "";
+  const initialGenre = searchParams.get("genre") || "";
 
   const [query, setQuery] = useState(initialQuery);
   const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
-  const [selectedGenre, setSelectedGenre] = useState("");
+  const [selectedGenre, setSelectedGenre] = useState(initialGenre);
   const [status, setStatus] = useState("");
   const [sort, setSort] = useState("");
+  const [type, setType] = useState(initialType);
   const [page, setPage] = useState(1);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
@@ -44,7 +68,8 @@ function BrowseContent() {
     selectedGenre,
     status,
     sort || undefined,
-    sort ? "desc" : undefined
+    sort ? "desc" : undefined,
+    type || undefined
   );
 
   useEffect(() => {
@@ -54,6 +79,16 @@ function BrowseContent() {
     }, 400);
     return () => clearTimeout(timer);
   }, [query]);
+
+  // Sync URL params
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (debouncedQuery) params.set("q", debouncedQuery);
+    if (type) params.set("type", type);
+    if (selectedGenre) params.set("genre", selectedGenre);
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }, [debouncedQuery, type, selectedGenre, router, pathname]);
 
   const genres = genresData?.data || [];
   const results = data?.data || [];
@@ -69,12 +104,32 @@ function BrowseContent() {
             className="mb-8"
           >
             <h1 className="text-3xl md:text-4xl font-extrabold mb-2">
-              Browse Anime
+              {type ? TYPE_LABELS[type] || "Browse Anime" : "Browse Anime"}
             </h1>
             <p className="text-muted-foreground">
               Discover and download your favorite anime
             </p>
           </motion.div>
+
+          {/* Type pills */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {typeOptions.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => {
+                  setType(opt.value);
+                  setPage(1);
+                }}
+                className={`rounded-full px-4 py-1.5 text-sm font-medium border transition-colors ${
+                  type === opt.value
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card border-border text-muted-foreground hover:text-foreground hover:border-primary/30"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
 
           <div className="flex gap-3 mb-6">
             <div className="relative flex-1">

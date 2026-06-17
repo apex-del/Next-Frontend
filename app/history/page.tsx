@@ -5,6 +5,7 @@ import { Clock, Trash2, X } from "lucide-react";
 import { motion } from "framer-motion";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/hooks/useAuth";
+import { makeAnimeSlug } from "@/lib/slug";
 import { useWatchHistory } from "@/hooks/useWatchHistory";
 
 export default function HistoryPage() {
@@ -83,7 +84,7 @@ export default function HistoryPage() {
                         transition={{ delay: i * 0.03 }}
                         className="flex items-center gap-4 rounded-lg bg-card border border-border p-4 hover:bg-surface-hover transition-colors group"
                       >
-                        <Link href={`/anime/${item.anime_id}`} className="shrink-0">
+                        <Link href={`/anime/${makeAnimeSlug(item.anime_title, item.anime_id)}`} className="shrink-0">
                           <img
                             src={item.anime_image}
                             alt={item.anime_title}
@@ -91,7 +92,7 @@ export default function HistoryPage() {
                           />
                         </Link>
                         <div className="flex-1 min-w-0">
-                          <Link href={`/anime/${item.anime_id}`} className="hover:text-primary transition-colors">
+                          <Link href={`/anime/${makeAnimeSlug(item.anime_title, item.anime_id)}`} className="hover:text-primary transition-colors">
                             <h4 className="text-sm font-semibold line-clamp-1">{item.anime_title}</h4>
                           </Link>
                           <p className="text-xs text-muted-foreground mt-0.5">

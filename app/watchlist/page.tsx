@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useFavorites } from "@/hooks/useFavorites";
 import Link from "next/link";
 import { ListChecks, Trash2, ExternalLink } from "lucide-react";
+import { makeAnimeSlug } from "@/lib/slug";
 
 type Tab = "planning" | "completed";
 
@@ -71,7 +72,7 @@ export default function WatchList() {
                   className="h-16 w-12 rounded-lg object-cover shrink-0"
                 />
                 <div className="flex-1 min-w-0">
-                  <Link href={`/anime/${fav.anime_id}`} className="text-sm font-bold hover:text-primary transition-colors line-clamp-1">
+                  <Link href={`/anime/${makeAnimeSlug(fav.anime_title, fav.anime_id)}`} className="text-sm font-bold hover:text-primary transition-colors line-clamp-1">
                     {fav.anime_title}
                   </Link>
                   <div className="flex gap-2 mt-1 text-xs text-muted-foreground">
@@ -80,7 +81,7 @@ export default function WatchList() {
                     {fav.anime_score && <span>  {fav.anime_score}</span>}
                   </div>
                 </div>
-                <Link href={`/anime/${fav.anime_id}`} className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-secondary transition-colors">
+                <Link href={`/anime/${makeAnimeSlug(fav.anime_title, fav.anime_id)}`} className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-secondary transition-colors">
                   <ExternalLink className="h-4 w-4" />
                 </Link>
                 <button

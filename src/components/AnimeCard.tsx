@@ -3,6 +3,7 @@ import { Star } from "lucide-react";
 import { motion } from "framer-motion";
 import type { JikanAnime } from "@/lib/jikan";
 import { getDisplayTitle } from "@/lib/jikan";
+import { makeAnimeSlug } from "@/lib/slug";
 
 interface AnimeCardProps {
   anime: JikanAnime;
@@ -16,7 +17,7 @@ export default function AnimeCard({ anime, index = 0 }: AnimeCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
     >
-      <Link href={`/anime/${anime.mal_id}`} className="group block">
+      <Link href={`/anime/${makeAnimeSlug(getDisplayTitle(anime), anime.mal_id)}`} className="group block">
         <div className="relative overflow-hidden rounded-lg bg-card transition-all duration-300 card-glow group-hover:card-glow-hover group-hover:scale-[1.03]">
           {/* Image */}
           <div className="relative aspect-[3/4] overflow-hidden">

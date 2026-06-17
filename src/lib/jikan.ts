@@ -1,6 +1,4 @@
-const WORKER_URL = "https://anime-stream-api.anonymous-0709200.workers.dev";
-const JIKAN_API = "https://api.jikan.moe/v4";
-const BASE_URL = WORKER_URL;
+const BASE_URL = "https://api.jikan.moe/v4";
 
 export interface JikanAnime {
   mal_id: number;
@@ -85,7 +83,7 @@ async function rateLimitedFetch(url: string): Promise<Response> {
   lastRequest = Date.now();
   const res = await fetch(url);
   if (!res.ok) {
-    throw new Error(`API error: ${res.status}`);
+    throw new Error(`Jikan API error: ${res.status}`);
   }
   return res;
 }
@@ -96,17 +94,16 @@ export async function getTopAnime(
 ): Promise<JikanResponse<JikanAnime[]>> {
   const params = new URLSearchParams({ page: String(page), limit: "20" });
   if (filter) params.set("filter", filter);
-  const endpoint = `/api/top?${params}`;
-  const res = await rateLimitedFetch(`${BASE_URL}${endpoint}`);
+  const res = await rateLimitedFetch(`${BASE_URL}/top/anime?${params}`);
   return res.json();
 }
 
 export async function getSeasonNow(
   page = 1
 ): Promise<JikanResponse<JikanAnime[]>> {
-  const params = new URLSearchParams({ page: String(page), limit: "20" });
-  const endpoint = `/api/seasons/now?${params}`;
-  const res = await rateLimitedFetch(`${BASE_URL}${endpoint}`);
+  const res = await rateLimitedFetch(
+    `${BASE_URL}/seasons/now?page=${page}&limit=20`
+  );
   return res.json();
 }
 
@@ -116,7 +113,8 @@ export async function searchAnime(
   genres?: string,
   status?: string,
   orderBy?: string,
-  sort?: string
+  sort?: string,
+  type?: string
 ): Promise<JikanResponse<JikanAnime[]>> {
   const params = new URLSearchParams({
     page: String(page),
@@ -128,16 +126,15 @@ export async function searchAnime(
   if (status) params.set("status", status);
   if (orderBy) params.set("order_by", orderBy);
   if (sort) params.set("sort", sort);
-  const endpoint = `/api/search?${params}`;
-  const res = await rateLimitedFetch(`${BASE_URL}${endpoint}`);
+  if (type) params.set("type", type);
+  const res = await rateLimitedFetch(`${BASE_URL}/anime?${params}`);
   return res.json();
 }
 
 export async function getAnimeById(
   id: number
 ): Promise<JikanResponse<JikanAnime>> {
-  const endpoint = `/api/anime/${id}/full`;
-  const res = await rateLimitedFetch(`${BASE_URL}${endpoint}`);
+  const res = await rateLimitedFetch(`${BASE_URL}/anime/${id}/full`);
   return res.json();
 }
 
@@ -145,25 +142,25 @@ export async function getAnimeEpisodes(
   id: number,
   page = 1
 ): Promise<JikanResponse<JikanEpisode[]>> {
-  const params = new URLSearchParams({ page: String(page) });
-  const endpoint = `/api/anime/${id}/episodes?${params}`;
-  const res = await rateLimitedFetch(`${BASE_URL}${endpoint}`);
+  const res = await rateLimitedFetch(
+    `${BASE_URL}/anime/${id}/episodes?page=${page}`
+  );
   return res.json();
 }
 
 export async function getAnimeRecommendations(
   id: number
 ): Promise<JikanResponse<Array<{ entry: JikanAnime }>>> {
-  const endpoint = `/api/anime/${id}/recommendations`;
-  const res = await rateLimitedFetch(`${BASE_URL}${endpoint}`);
+  const res = await rateLimitedFetch(
+    `${BASE_URL}/anime/${id}/recommendations`
+  );
   return res.json();
 }
 
 export async function getGenres(): Promise<
   JikanResponse<Array<{ mal_id: number; name: string; count: number }>>
 > {
-  const endpoint = `/api/genres`;
-  const res = await rateLimitedFetch(`${BASE_URL}${endpoint}`);
+  const res = await rateLimitedFetch(`${BASE_URL}/genres/anime`);
   return res.json();
 }
 

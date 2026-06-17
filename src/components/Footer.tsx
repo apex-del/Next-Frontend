@@ -20,6 +20,10 @@ const footerLinks = {
     { label: "Comedy", href: "/browse?genre=4" },
     { label: "Fantasy", href: "/browse?genre=10" },
   ],
+  Legal: [
+    { label: "Terms of Use", href: "/terms" },
+    { label: "Privacy Policy", href: "/privacy" },
+  ],
 };
 
 export default function Footer() {
@@ -76,10 +80,18 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} AnimeStream. Built with{" "}
-            <Heart className="inline h-3 w-3 text-primary fill-primary" /> using Jikan API.
-          </p>
+          <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+            <span>© {new Date().getFullYear()} AnimeStream.</span>
+            <Link href="/terms" className="hover:text-primary transition-colors">
+              Terms
+            </Link>
+            <Link href="/privacy" className="hover:text-primary transition-colors">
+              Privacy
+            </Link>
+            <span className="hidden sm:inline">
+              Built with <Heart className="inline h-3 w-3 text-primary fill-primary" /> using Jikan API.
+            </span>
+          </div>
           <p className="text-xs text-muted-foreground">
             Data sourced from MyAnimeList via Jikan API. Not affiliated with MAL.
           </p>
