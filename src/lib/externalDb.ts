@@ -1,6 +1,8 @@
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL || "";
-const EXT_FALLBACK_URL = process.env.NEXT_PUBLIC_EXT_SUPABASE_URL || "https://fzrpquslqktavfqbmccu.supabase.co";
-const EXT_FALLBACK_KEY = process.env.NEXT_PUBLIC_EXT_SUPABASE_KEY || "sb_publishable_1Mj9H6h54_sJqKdTCHjLkQ_bxid-IGr";
+const OKKUP_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://okkupxjkocgasztfldak.supabase.co";
+const OKKUP_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const FZR_URL = process.env.NEXT_PUBLIC_EXT_SUPABASE_URL || "https://fzrpquslqktavfqbmccu.supabase.co";
+const FZR_KEY = process.env.NEXT_PUBLIC_EXT_SUPABASE_KEY || "sb_publishable_1Mj9H6h54_sJqKdTCHjLkQ_bxid-IGr";
 
 export interface StreamLink {
   id: string;
@@ -73,9 +75,16 @@ async function apiFetch(table: string, params: URLSearchParams): Promise<any[]> 
       if (res.ok) return res.json();
     } catch {}
   }
+  // Try OKKUP first
   try {
-    const headers = { apikey: EXT_FALLBACK_KEY, Authorization: `Bearer ${EXT_FALLBACK_KEY}` };
-    const res = await fetch(`${EXT_FALLBACK_URL}/rest/v1/${table}?${params}`, { headers });
+    const headers = { apikey: OKKUP_KEY, Authorization: `Bearer ${OKKUP_KEY}` };
+    const res = await fetch(`${OKKUP_URL}/rest/v1/${table}?${params}`, { headers });
+    if (res.ok) { const d = await res.json(); if (d?.length) return d; }
+  } catch {}
+  // Fallback to FZR
+  try {
+    const headers = { apikey: FZR_KEY, Authorization: `Bearer ${FZR_KEY}` };
+    const res = await fetch(`${FZR_URL}/rest/v1/${table}?${params}`, { headers });
     if (!res.ok) return [];
     return res.json();
   } catch {
@@ -132,6 +141,32 @@ export async function fetchShortLinks(malId: number, episode?: number): Promise<
 }
 
 export async function fetchExtEpisodes(malId: number): Promise<ExtEpisode[]> {
+  // Try OKKUP (uses anime_id)
+  try {
+    const p = new URLSearchParams({
+      select: "episode_number,title,title_english,aired,score,filler,recap,thumbnail,synopsis",
+      anime_id: `eq.${malId}`,
+      order: "episode_number.asc",
+    });
+    const headers = { apikey: OKKUP_KEY, Authorization: `Bearer ${OKKUP_KEY}` };
+    const res = await fetch(`${OKKUP_URL}/rest/v1/episodes?${p}`, { headers });
+    if (res.ok) {
+      const d = await res.json();
+      if (d?.length) {
+        return d.map((e: any) => ({
+          episode_number: e.episode_number,
+          title: e.title,
+          title_english: e.title_english || e.title,
+          aired_string: e.aired,
+          score: e.score,
+          filler: e.filler,
+          recap: e.recap,
+          thumbnail: e.thumbnail,
+        }));
+      }
+    }
+  } catch {}
+  // Fallback to FZR (uses anime_mal_id)
   const p = new URLSearchParams({
     select: "episode_number,title,title_english,aired_string,score,filler,recap,thumbnail",
     anime_mal_id: `eq.${malId}`,

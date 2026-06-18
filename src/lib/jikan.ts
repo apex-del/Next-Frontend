@@ -1,4 +1,83 @@
 const BASE_URL = "https://api.jikan.moe/v4";
+const OKKUP_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://okkupxjkocgasztfldak.supabase.co";
+const OKKUP_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const FZR_URL = process.env.NEXT_PUBLIC_EXT_SUPABASE_URL || "https://fzrpquslqktavfqbmccu.supabase.co";
+const FZR_KEY = process.env.NEXT_PUBLIC_EXT_SUPABASE_KEY || "sb_publishable_1Mj9H6h54_sJqKdTCHjLkQ_bxid-IGr";
+
+async function fetchAnimeFromDb(malId: number): Promise<JikanAnime | null> {
+  // Try OKKUP first
+  try {
+    const headers = { apikey: OKKUP_KEY, Authorization: `Bearer ${OKKUP_KEY}` };
+    const res = await fetch(`${OKKUP_URL}/rest/v1/anime?mal_id=eq.${malId}&limit=1`, { headers });
+    if (res.ok) {
+      const rows = await res.json();
+      if (rows?.length) return mapDbRowToJikan(rows[0]);
+    }
+  } catch {}
+  // Fallback FZR
+  try {
+    const headers = { apikey: FZR_KEY, Authorization: `Bearer ${FZR_KEY}` };
+    const res = await fetch(`${FZR_URL}/rest/v1/anime?mal_id=eq.${malId}&limit=1`, { headers });
+    if (!res.ok) return null;
+    const rows = await res.json();
+    if (!rows?.length) return null;
+    return mapDbRowToJikan(rows[0]);
+  } catch { return null; }
+}
+
+function mapDbRowToJikan(r: any): JikanAnime {
+  return {
+    mal_id: r.mal_id,
+    title: r.title || r.title_english || "",
+    title_english: r.title_english || null,
+    title_japanese: r.title_japanese || null,
+    synopsis: r.synopsis || r.description || null,
+    score: r.score || (r.average_score ? r.average_score / 10 : null),
+    scored_by: r.scored_by || null,
+    rank: r.rank || null,
+    popularity: r.popularity || null,
+    members: r.members || null,
+    episodes: r.episodes || 0,
+    status: r.status || "",
+    rating: r.rating || r.age_rating || null,
+    year: r.start_date_year || r.aired_from_year || null,
+    season: r.season || null,
+    type: r.type || r.format || "",
+    source: r.source || "",
+    duration: typeof r.duration === "number" ? `${r.duration} min` : r.duration || "",
+    aired: {
+      from: r.aired_from || null,
+      to: r.aired_to || null,
+      string: r.aired_string || "",
+    },
+    studios: [],
+    genres: [],
+    themes: [],
+    images: {
+      jpg: {
+        image_url: r.image_url || "",
+        small_image_url: r.image_small || r.image_url || "",
+        large_image_url: r.image_large || r.image_url || "",
+      },
+      webp: {
+        image_url: r.image_webp || r.image_url || "",
+        small_image_url: r.image_webp_small || r.image_webp || r.image_url || "",
+        large_image_url: r.image_webp_large || r.image_webp || r.image_url || "",
+      },
+    },
+    trailer: {
+      youtube_id: r.trailer_youtube_id || null,
+      url: r.trailer_url || null,
+      images: {
+        image_url: r.trailer_image_url || null,
+        small_image_url: null,
+        medium_image_url: null,
+        large_image_url: r.trailer_image_url || null,
+        maximum_image_url: null,
+      },
+    },
+  };
+}
 
 export interface JikanAnime {
   mal_id: number;
@@ -134,6 +213,8 @@ export async function searchAnime(
 export async function getAnimeById(
   id: number
 ): Promise<JikanResponse<JikanAnime>> {
+  const cached = await fetchAnimeFromDb(id);
+  if (cached) return { data: cached };
   const res = await rateLimitedFetch(`${BASE_URL}/anime/${id}/full`);
   return res.json();
 }
@@ -151,15 +232,117 @@ export async function getAnimeEpisodes(
 export async function getAnimeRecommendations(
   id: number
 ): Promise<JikanResponse<Array<{ entry: JikanAnime }>>> {
-  const res = await rateLimitedFetch(
-    `${BASE_URL}/anime/${id}/recommendations`
-  );
+  // Try OKKUP first
+  try {
+    const headers = { apikey: OKKUP_KEY, Authorization: `Bearer ${OKKUP_KEY}` };
+    const res = await fetch(`${OKKUP_URL}/rest/v1/recommendations?anime_id=eq.${id}&select=recommended_mal_id,recommended_title,recommended_image,votes&order=votes.desc&limit=12`, { headers });
+    if (res.ok) {
+      const rows = await res.json();
+      if (rows?.length) {
+        return {
+          data: rows.map((r: any) => ({
+            entry: {
+              mal_id: r.recommended_mal_id,
+              title: r.recommended_title,
+              title_english: null,
+              title_japanese: null,
+              synopsis: null,
+              score: null,
+              scored_by: null,
+              rank: null,
+              popularity: null,
+              members: null,
+              episodes: 0,
+              status: "",
+              rating: null,
+              year: null,
+              season: null,
+              type: "",
+              source: "",
+              duration: "",
+              aired: { from: null, to: null, string: "" },
+              studios: [],
+              genres: [],
+              themes: [],
+              images: {
+                jpg: { image_url: r.recommended_image || "", small_image_url: "", large_image_url: r.recommended_image || "" },
+                webp: { image_url: "", small_image_url: "", large_image_url: "" },
+              },
+              trailer: { youtube_id: null, url: null, images: { image_url: null, small_image_url: null, medium_image_url: null, large_image_url: null, maximum_image_url: null } },
+            },
+          })),
+        };
+      }
+    }
+  } catch {}
+  // Fallback FZR
+  try {
+    const headers = { apikey: FZR_KEY, Authorization: `Bearer ${FZR_KEY}` };
+    const res = await fetch(`${FZR_URL}/rest/v1/anime_recommendations?anime_mal_id=eq.${id}&select=recommended_mal_id,recommended_title,recommended_image_url,vote_count&limit=20`, { headers });
+    if (res.ok) {
+      const rows = await res.json();
+      if (rows?.length) {
+        return {
+          data: rows.map((r: any) => ({
+            entry: {
+              mal_id: r.recommended_mal_id,
+              title: r.recommended_title,
+              title_english: null,
+              title_japanese: null,
+              synopsis: null,
+              score: null,
+              scored_by: null,
+              rank: null,
+              popularity: null,
+              members: null,
+              episodes: 0,
+              status: "",
+              rating: null,
+              year: null,
+              season: null,
+              type: "",
+              source: "",
+              duration: "",
+              aired: { from: null, to: null, string: "" },
+              studios: [],
+              genres: [],
+              themes: [],
+              images: {
+                jpg: { image_url: r.recommended_image_url || "", small_image_url: "", large_image_url: r.recommended_image_url || "" },
+                webp: { image_url: "", small_image_url: "", large_image_url: "" },
+              },
+              trailer: { youtube_id: null, url: null, images: { image_url: null, small_image_url: null, medium_image_url: null, large_image_url: null, maximum_image_url: null } },
+            },
+          })),
+        };
+      }
+    }
+  } catch {}
+  const res = await rateLimitedFetch(`${BASE_URL}/anime/${id}/recommendations`);
   return res.json();
 }
 
 export async function getGenres(): Promise<
   JikanResponse<Array<{ mal_id: number; name: string; count: number }>>
 > {
+  // Try OKKUP first
+  try {
+    const headers = { apikey: OKKUP_KEY, Authorization: `Bearer ${OKKUP_KEY}` };
+    const res = await fetch(`${OKKUP_URL}/rest/v1/genres?select=mal_id,name&limit=100`, { headers });
+    if (res.ok) {
+      const rows = await res.json();
+      if (rows?.length) return { data: rows.map((g: any) => ({ mal_id: g.mal_id, name: g.name, count: 0 })) };
+    }
+  } catch {}
+  // Fallback FZR
+  try {
+    const headers = { apikey: FZR_KEY, Authorization: `Bearer ${FZR_KEY}` };
+    const res = await fetch(`${FZR_URL}/rest/v1/genres?select=mal_id,name,count&limit=100`, { headers });
+    if (res.ok) {
+      const rows = await res.json();
+      if (rows?.length) return { data: rows.map((g: any) => ({ mal_id: g.mal_id, name: g.name, count: g.count || 0 })) };
+    }
+  } catch {}
   const res = await rateLimitedFetch(`${BASE_URL}/genres/anime`);
   return res.json();
 }

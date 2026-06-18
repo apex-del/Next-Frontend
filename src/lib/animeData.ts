@@ -1,11 +1,13 @@
 import {
-  getAnimeEpisodes as jikanEpisodes,
   getAnimeRecommendations as jikanRecs,
   type JikanEpisode,
   type JikanAnime,
 } from "./jikan";
 import { fetchExtEpisodes } from "./externalDb";
 import { getAniListMedia } from "./anilist";
+
+const OKKUP_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://okkupxjkocgasztfldak.supabase.co";
+const OKKUP_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
 export interface EpisodesResult {
   data: JikanEpisode[];
@@ -16,17 +18,6 @@ export interface EpisodesResult {
 const PAGE = 100;
 
 export async function getEpisodesTrio(id: number, page = 1): Promise<EpisodesResult> {
-  try {
-    const jk = await jikanEpisodes(id, page);
-    if (jk?.data?.length) {
-      return {
-        data: jk.data,
-        pagination: jk.pagination,
-        source: "jikan",
-      };
-    }
-  } catch {}
-
   try {
     const ext = await fetchExtEpisodes(id);
     if (ext.length) {
@@ -113,6 +104,27 @@ function anilistImg(url: string | null): JikanAnime["images"] {
 }
 
 export async function getRecommendationsTrio(id: number): Promise<RecEntry[]> {
+  // Try OKKUP first
+  try {
+    const headers = { apikey: OKKUP_KEY, Authorization: `Bearer ${OKKUP_KEY}` };
+    const res = await fetch(`${OKKUP_URL}/rest/v1/recommendations?anime_id=eq.${id}&select=recommended_mal_id,recommended_title,recommended_image,votes&order=votes.desc&limit=12`, { headers });
+    if (res.ok) {
+      const rows = await res.json();
+      if (rows?.length) {
+        return rows.map((r: any) => ({
+          entry: {
+            mal_id: r.recommended_mal_id,
+            title: r.recommended_title,
+            images: {
+              jpg: { image_url: r.recommended_image || "", small_image_url: "", large_image_url: r.recommended_image || "" },
+              webp: { image_url: "", small_image_url: "", large_image_url: "" },
+            },
+            score: null,
+          },
+        }));
+      }
+    }
+  } catch {}
   try {
     const jk = await jikanRecs(id);
     if (jk?.data?.length) return jk.data as unknown as RecEntry[];

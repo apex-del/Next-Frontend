@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://znhcxgkjawoahmtqdklg.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuaGN4Z2tqYXdvYWhtdHFka2xnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NTY3NjYsImV4cCI6MjA4NjEzMjc2Nn0._oEtgWq-VwaVcnikIbSwVfpamty5zlyNvYu_lZCO4Ss';
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://okkupxjkocgasztfldak.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ra3VweGprb2NnYXN6dGZsZGFrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NDI4MDUsImV4cCI6MjA5NzExODgwNX0.jHLJ7_Zz1tiVQgxjLW9OTLcnmGdmMMrNhDp3ZIalptI';
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
