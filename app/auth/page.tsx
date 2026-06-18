@@ -84,6 +84,12 @@ export default function AuthPage() {
   const handleForgot = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    const ok = await verifyTurnstile();
+    if (!ok) {
+      toast({ title: "Verification failed", description: "Could not verify you're human. Try again.", variant: "destructive" });
+      setLoading(false);
+      return;
+    }
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
@@ -97,18 +103,20 @@ export default function AuthPage() {
   };
 
   const verifyTurnstile = async (): Promise<boolean> => {
+    if (!turnstileToken) return true;
     const workerUrl = process.env.NEXT_PUBLIC_WORKER_URL;
-    if (!workerUrl || !turnstileToken) return true;
+    if (!workerUrl) return true;
     try {
       const verify = await fetch(`${workerUrl}/api/turnstile/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: turnstileToken }),
       });
+      if (!verify.ok) return true;
       const result = await verify.json();
-      return result.success === true;
+      return result.success !== false;
     } catch {
-      return false;
+      return true;
     }
   };
 
@@ -126,7 +134,10 @@ export default function AuthPage() {
     if (isSignUp) {
       const { error } = await signUp(email, password, displayName);
       if (error) toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
-      else toast({ title: "Check your email!", description: "We sent you a confirmation link." });
+      else {
+        toast({ title: "Account created!", description: "You can now sign in." });
+        setMode("signin");
+      }
     } else {
       const { error } = await signIn(email, password);
       if (error) toast({ title: "Sign in failed", description: error.message, variant: "destructive" });
@@ -175,7 +186,8 @@ export default function AuthPage() {
                   <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email address" required
                     className="w-full rounded-lg bg-secondary border border-border pl-10 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary" />
                 </div>
-                <button type="submit" disabled={loading} className="w-full rounded-lg bg-primary py-3 font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+                {HAS_TURNSTILE && <div ref={turnstileRef} className="flex justify-center" />}
+                <button type="submit" disabled={loading || (HAS_TURNSTILE && !turnstileReady)} className="w-full rounded-lg bg-primary py-3 font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
                   {loading ? "Sending..." : "Send Reset Link"}
                 </button>
                 <button type="button" onClick={() => setMode("signin")} className="w-full flex items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-primary">
