@@ -1,5 +1,4 @@
 const ANILIST_API = "https://graphql.anilist.co";
-
 const CACHE_PREFIX = "ani_cache_";
 const CACHE_TTL = 10 * 60 * 1000;
 
@@ -19,56 +18,18 @@ function cachedFetch<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
   });
 }
 
-const LIST_QUERY = `
-query ($page: Int, $perPage: Int, $sort: [MediaSort], $season: Season, $seasonYear: Int, $search: String, $genre: String, $status: MediaStatus, $format: MediaFormat) {
-  Page(page: $page, perPage: $perPage) {
-    media(type: ANIME, sort: $sort, season: $season, seasonYear: $seasonYear, search: $search, genre: $genre, status: $status, format: $format, isAdult: false) {
-      id idMal
-      title { romaji english native }
-      description
-      averageScore meanScore popularity
-      rankings { rank type }
-      episodes status season seasonYear format source duration
-      startDate { year month day }
-      genres studios { nodes { name } }
-      coverImage { extraLarge large medium }
-      bannerImage trailer { id site }
-    }
-  }
-}`;
-
-const DETAIL_QUERY = `
-query ($idMal: Int) {
-  Media(idMal: $idMal, type: ANIME) {
-    id idMal
-    title { romaji english native }
-    description averageScore meanScore popularity
-    rankings { rank type }
-    episodes status season seasonYear format source duration
-    startDate { year month day }
-    genres studios { nodes { name } }
-    coverImage { extraLarge large medium }
-    bannerImage trailer { id site }
-  }
-}`;
-
-const RECS_QUERY = `
-query ($idMal: Int) {
-  Media(idMal: $idMal) {
-    recommendations(page: 1, perPage: 12, sort: RATING_DESC) {
-      nodes {
-        mediaRecommendation {
-          id idMal
-          title { romaji english }
-          coverImage { extraLarge large medium }
-          averageScore format episodes
-        }
-      }
-    }
-  }
-}`;
-
-const GENRES_QUERY = `{ GenreCollection }`;
+const MEDIA_FIELDS = `
+  id idMal
+  title { romaji english native }
+  description
+  averageScore meanScore popularity
+  rankings { rank type }
+  episodes status season seasonYear format source duration
+  startDate { year month day }
+  genres studios { nodes { name } }
+  coverImage { extraLarge large medium }
+  bannerImage trailer { id site }
+`;
 
 interface AniMedia {
   id: number;
@@ -203,33 +164,17 @@ function mapToJikan(media: AniMedia) {
   };
 }
 
-function aniSort(s: string): string[] {
-  if (s === "bypopularity") return ["POPULARITY_DESC"];
-  if (s === "favorite") return ["TRENDING_DESC"];
-  if (s === "airing") return ["TRENDING_DESC"];
-  if (s === "upcoming") return ["POPULARITY_DESC"];
-  return ["SCORE_DESC"];
-}
-
-function aniStatus(s: string): string | null {
-  if (s === "airing") return "RELEASING";
-  if (s === "complete") return "FINISHED";
-  if (s === "upcoming") return "NOT_YET_RELEASED";
-  return null;
-}
-
-function aniFormat(s: string): string | null {
-  const map: Record<string, string> = { tv: "TV", movie: "MOVIE", ova: "OVA", ona: "ONA", special: "SPECIAL", music: "MUSIC" };
-  return map[s] || null;
-}
-
 async function aniFetch<T>(query: string, vars: Record<string, any>): Promise<T> {
+  for (const k of Object.keys(vars)) { if (vars[k] === undefined) delete vars[k]; }
   const res = await fetch(ANILIST_API, {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({ query, variables: vars }),
   });
-  if (!res.ok) throw new Error(`AniList API error: ${res.status}`);
+  if (!res.ok) {
+    const txt = await res.text().catch(() => "");
+    throw new Error(`AniList API error ${res.status}: ${txt.slice(0, 200)}`);
+  }
   const json = await res.json();
   if (json.errors) throw new Error(json.errors[0]?.message || "AniList error");
   return json.data;
@@ -238,8 +183,10 @@ async function aniFetch<T>(query: string, vars: Record<string, any>): Promise<T>
 export async function getTopAnime(page = 1, filter = ""): Promise<{ data: any[]; pagination?: any }> {
   const cacheKey = `ani-top-${page}-${filter}`;
   return cachedFetch(cacheKey, async () => {
-    const sort = aniSort(filter);
-    const data = await aniFetch<{ Page: { media: AniMedia[] } }>(LIST_QUERY, { page, perPage: 20, sort });
+    const sort = filter === "bypopularity" ? ["POPULARITY_DESC"] : filter === "favorite" ? ["TRENDING_DESC"] : filter === "airing" ? ["TRENDING_DESC", "SCORE_DESC"] : filter === "upcoming" ? ["POPULARITY_DESC", "SCORE_DESC"] : ["SCORE_DESC"];
+    const status = filter === "airing" ? "RELEASING" : filter === "upcoming" ? "NOT_YET_RELEASED" : undefined;
+    const q = `query($p:Int,$s:[MediaSort],$st:MediaStatus){Page(page:$p,perPage:20){media(type:ANIME,sort:$s,status:$st,isAdult:false){${MEDIA_FIELDS}}}}`;
+    const data = await aniFetch<{ Page: { media: AniMedia[] } }>(q, { p: page, s: sort, st: status });
     return { data: (data.Page?.media || []).map(mapToJikan) };
   });
 }
@@ -248,12 +195,11 @@ export async function getSeasonNow(page = 1): Promise<{ data: any[]; pagination?
   const cacheKey = `ani-season-${page}`;
   return cachedFetch(cacheKey, async () => {
     const now = new Date();
-    const month = now.getMonth() + 1;
-    const year = now.getFullYear();
-    const season = month <= 3 ? "SPRING" : month <= 6 ? "SUMMER" : month <= 9 ? "FALL" : "WINTER";
-    const data = await aniFetch<{ Page: { media: AniMedia[] } }>(LIST_QUERY, {
-      page, perPage: 20, sort: ["POPULARITY_DESC"], season, seasonYear: year,
-    });
+    const m = now.getMonth() + 1;
+    const y = now.getFullYear();
+    const sea = m <= 3 ? "SPRING" : m <= 6 ? "SUMMER" : m <= 9 ? "FALL" : "WINTER";
+    const q = `query($p:Int,$sea:Season,$y:Int){Page(page:$p,perPage:20){media(type:ANIME,season:$sea,seasonYear:$y,sort:POPULARITY_DESC,isAdult:false){${MEDIA_FIELDS}}}}`;
+    const data = await aniFetch<{ Page: { media: AniMedia[] } }>(q, { p: page, sea, y });
     return { data: (data.Page?.media || []).map(mapToJikan) };
   });
 }
@@ -265,13 +211,10 @@ export async function searchAnime(
   const cacheKey = `ani-search-${query}-${page}-${genre}-${status}-${orderBy}-${type}`;
   return cachedFetch(cacheKey, async () => {
     const sort = orderBy === "score" ? ["SCORE_DESC"] : orderBy === "popularity" ? ["POPULARITY_DESC"] : orderBy === "start_date" ? ["START_DATE_DESC"] : undefined;
-    const data = await aniFetch<{ Page: { media: AniMedia[] } }>(LIST_QUERY, {
-      page, perPage: 24, search: query || undefined,
-      genre: genre || undefined,
-      status: aniStatus(status || "") || undefined,
-      sort,
-      format: aniFormat(type || "") || undefined,
-    });
+    const st = status === "airing" ? "RELEASING" : status === "complete" ? "FINISHED" : status === "upcoming" ? "NOT_YET_RELEASED" : undefined;
+    const fmt = type === "tv" ? "TV" : type === "movie" ? "MOVIE" : type === "ova" ? "OVA" : type === "ona" ? "ONA" : type === "special" ? "SPECIAL" : type === "music" ? "MUSIC" : undefined;
+    const q = `query($p:Int,$q:String,$g:String,$st:MediaStatus,$s:[MediaSort],$f:MediaFormat){Page(page:$p,perPage:24){media(type:ANIME,search:$q,genre:$g,status:$st,sort:$s,format:$f,isAdult:false){${MEDIA_FIELDS}}}}`;
+    const data = await aniFetch<{ Page: { media: AniMedia[] } }>(q, { p: page, q: query || undefined, g: genre || undefined, st, s: sort, f: fmt });
     return { data: (data.Page?.media || []).map(mapToJikan) };
   });
 }
@@ -279,7 +222,8 @@ export async function searchAnime(
 export async function getAnimeById(id: number): Promise<{ data: any }> {
   const cacheKey = `ani-byid-${id}`;
   return cachedFetch(cacheKey, async () => {
-    const data = await aniFetch<{ Media: AniMedia }>(DETAIL_QUERY, { idMal: id });
+    const q = `query($id:Int){Media(idMal:$id,type:ANIME){${MEDIA_FIELDS}}}`;
+    const data = await aniFetch<{ Media: AniMedia }>(q, { id });
     return { data: mapToJikan(data.Media) };
   });
 }
@@ -287,19 +231,18 @@ export async function getAnimeById(id: number): Promise<{ data: any }> {
 export async function getAnimeRecommendations(id: number): Promise<{ data: Array<{ entry: any }> }> {
   const cacheKey = `ani-recs-${id}`;
   return cachedFetch(cacheKey, async () => {
-    const data = await aniFetch<{ Media: { recommendations: { nodes: Array<{ mediaRecommendation: AniMedia | null }> } } }>(RECS_QUERY, { idMal: id });
+    const q = `query($id:Int){Media(idMal:$id){recommendations(page:1,perPage:12,sort:RATING_DESC){nodes{mediaRecommendation{id idMal title{romaji english}coverImage{extraLarge large medium}averageScore format episodes}}}}}`;
+    const data = await aniFetch<{ Media: { recommendations: { nodes: Array<{ mediaRecommendation: AniMedia | null }> } } }>(q, { id });
     const nodes = data.Media?.recommendations?.nodes || [];
-    return {
-      data: nodes.filter((n) => n.mediaRecommendation).map((n) => ({ entry: mapToJikan(n.mediaRecommendation!) })),
-    };
+    return { data: nodes.filter((n) => n.mediaRecommendation).map((n) => ({ entry: mapToJikan(n.mediaRecommendation!) })) };
   });
 }
 
 export async function getGenres(): Promise<{ data: Array<{ mal_id: number; name: string; count: number }> }> {
   const cacheKey = "ani-genres";
   return cachedFetch(cacheKey, async () => {
-    const data = await aniFetch<{ GenreCollection: string[] }>(GENRES_QUERY, {});
-    return { data: (data.GenreCollection || []).map((name: string, i: number) => ({ mal_id: i + 1, name, count: 0 })) };
+    const data = await aniFetch<{ GenreCollection: string[] }>("{GenreCollection}", {});
+    return { data: (data.GenreCollection || []).map((n: string, i: number) => ({ mal_id: i + 1, name: n, count: 0 })) };
   });
 }
 

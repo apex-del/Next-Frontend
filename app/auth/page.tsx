@@ -39,7 +39,7 @@ export default function AuthPage() {
     script.onload = () => {
       if (turnstileRef.current) {
         const id = (window as any).turnstile.render(turnstileRef.current, {
-          sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "",
+          sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA",
           theme: "dark",
           callback: (token: string) => { setTurnstileToken(token); setTurnstileReady(true); },
         });
@@ -64,7 +64,7 @@ export default function AuthPage() {
     }
     if (typeof window !== "undefined" && turnstileRef.current && (window as any).turnstile) {
       const id = (window as any).turnstile.render(turnstileRef.current, {
-        sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "",
+        sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA",
         theme: "dark",
         callback: (token: string) => { setTurnstileToken(token); setTurnstileReady(true); },
       });
@@ -80,8 +80,9 @@ export default function AuthPage() {
   const handleForgot = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${siteUrl}/reset-password`,
     });
     setLoading(false);
     if (error) {
@@ -92,30 +93,34 @@ export default function AuthPage() {
     }
   };
 
+  const verifyTurnstile = async (): Promise<boolean> => {
+    const workerUrl = process.env.NEXT_PUBLIC_WORKER_URL;
+    if (!workerUrl || !turnstileToken) return true;
+    try {
+      const verify = await fetch(`${workerUrl}/api/turnstile/verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: turnstileToken }),
+      });
+      const result = await verify.json();
+      return result.success === true;
+    } catch {
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
+    const ok = await verifyTurnstile();
+    if (!ok) {
+      toast({ title: "Verification failed", description: "Could not verify you're human. Try again.", variant: "destructive" });
+      setLoading(false);
+      return;
+    }
+
     if (isSignUp) {
-      const workerUrl = process.env.NEXT_PUBLIC_WORKER_URL;
-      if (workerUrl && !turnstileToken) {
-        toast({ title: "Verify you're human", description: "Please complete the Turnstile challenge.", variant: "destructive" });
-        setLoading(false);
-        return;
-      }
-      if (workerUrl && turnstileToken) {
-        const verify = await fetch(`${workerUrl}/api/turnstile/verify`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token: turnstileToken }),
-        });
-        const result = await verify.json();
-        if (!result.success) {
-          toast({ title: "Verification failed", description: "Could not verify you're human. Try again.", variant: "destructive" });
-          setLoading(false);
-          return;
-        }
-      }
       const { error } = await signUp(email, password, displayName);
       if (error) toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
       else toast({ title: "Check your email!", description: "We sent you a confirmation link." });
@@ -226,10 +231,8 @@ export default function AuthPage() {
                       </button>
                     </div>
                   )}
-                  {isSignUp && (
-                    <div ref={turnstileRef} className="flex justify-center" />
-                  )}
-                  <button type="submit" disabled={loading || (isSignUp && !turnstileReady)} className="w-full rounded-lg bg-primary py-3 font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+                  <div ref={turnstileRef} className="flex justify-center" />
+                  <button type="submit" disabled={loading || !turnstileReady} className="w-full rounded-lg bg-primary py-3 font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
                     {loading ? "Loading..." : isSignUp ? "Create Account" : "Sign In"}
                   </button>
                 </form>
