@@ -162,7 +162,7 @@ export default function AnimeComments({ animeId }: AnimeCommentsProps) {
     Object.values(map).forEach((arr) =>
       arr.sort((a, b) => +new Date(a.created_at) - +new Date(b.created_at))
     );
-    let sorted = [...top];
+    const sorted = [...top];
     if (sort === "oldest") sorted.sort((a, b) => +new Date(a.created_at) - +new Date(b.created_at));
     else if (sort === "newest") sorted.sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
     else if (sort === "top") {

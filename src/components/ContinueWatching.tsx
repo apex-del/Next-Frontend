@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useMemo } from "react";
 import { useWatchHistory } from "@/hooks/useWatchHistory";
 import { useAuth } from "@/hooks/useAuth";
+import { makeAnimeSlug } from "@/lib/slug";
 
 export default function ContinueWatching() {
   const { user } = useAuth();
@@ -41,7 +42,7 @@ export default function ContinueWatching() {
             className="snap-start shrink-0 w-40 sm:w-48"
           >
             <Link
-              href={`/watch/${h.anime_id}?ep=${h.episode_number || 1}`}
+              href={`/watch/${makeAnimeSlug(h.anime_title, h.anime_id)}?ep=${h.episode_number || 1}`}
               className="block group relative rounded-xl overflow-hidden border border-border bg-card hover:border-primary/40 transition-colors"
             >
               <div className="relative aspect-video overflow-hidden">
