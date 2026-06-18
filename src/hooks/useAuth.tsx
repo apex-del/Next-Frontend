@@ -73,9 +73,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
+      if (session) {
+        setSession(session);
+        setUser(session.user ?? null);
+        setLoading(false);
+        return;
+      }
+      const hash = window.location.hash;
+      if (hash && (hash.includes("access_token") || hash.includes("refresh_token"))) {
+        supabase.auth.getSession().then(({ data: { session: s } }) => {
+          if (s) {
+            setSession(s);
+            setUser(s.user ?? null);
+          }
+          setLoading(false);
+        });
+      } else {
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
