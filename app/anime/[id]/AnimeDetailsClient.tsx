@@ -249,7 +249,7 @@ export default function AnimeDetailsClient({ animeId }: AnimeDetailsClientProps)
             </div>
 
             <div className="flex flex-wrap gap-2 mb-5">
-              {anime.genres.map((g) => (
+              {anime.genres.map((g: { mal_id: number; name: string }) => (
                 <Link
                   key={g.mal_id}
                   href={`/browse?genre=${g.mal_id}`}
@@ -258,7 +258,7 @@ export default function AnimeDetailsClient({ animeId }: AnimeDetailsClientProps)
                   {g.name}
                 </Link>
               ))}
-              {anime.themes?.map((t) => (
+              {anime.themes?.map((t: { mal_id: number; name: string }) => (
                 <span
                   key={t.mal_id}
                   className="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground"

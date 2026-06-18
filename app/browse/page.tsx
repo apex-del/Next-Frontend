@@ -92,7 +92,7 @@ function BrowseContent() {
 
   const genres = genresData?.data || [];
   const results = data?.data || [];
-  const pagination = data?.pagination;
+  const pagination = (data as any)?.pagination;
 
   return (
     <Layout>

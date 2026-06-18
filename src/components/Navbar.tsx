@@ -60,8 +60,8 @@ export default function Navbar() {
           <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
           {!searchOpen && (
             <Link href="/" className="flex items-center gap-2 group md:hidden">
-              <img src="/logo.png" alt="ApexAnime" className="h-7 w-7" />
-              <span className="text-base font-bold tracking-tight">
+              <img src="/logo.png" alt="ApexAnime" className="h-8 w-8" />
+              <span className="text-lg font-bold tracking-tight">
                 Apex<span className="text-primary">Anime</span>
               </span>
             </Link>

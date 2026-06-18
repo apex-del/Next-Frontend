@@ -43,7 +43,7 @@ export default function AnimeCharacters({ animeId, compact }: { animeId: number;
     queryKey: ["anime-characters", animeId],
     queryFn: async () => {
       const res = await fetch(`https://api.jikan.moe/v4/anime/${animeId}/characters`);
-      if (!res.ok) throw new Error("Failed");
+      if (!res.ok) return { data: [] };
       return res.json() as Promise<{ data: Character[] }>;
     },
     staleTime: 10 * 60 * 1000,

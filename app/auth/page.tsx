@@ -39,7 +39,7 @@ export default function AuthPage() {
     script.onload = () => {
       if (turnstileRef.current) {
         const id = (window as any).turnstile.render(turnstileRef.current, {
-          sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA",
+          sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "",
           theme: "dark",
           callback: (token: string) => { setTurnstileToken(token); setTurnstileReady(true); },
         });
@@ -64,7 +64,7 @@ export default function AuthPage() {
     }
     if (typeof window !== "undefined" && turnstileRef.current && (window as any).turnstile) {
       const id = (window as any).turnstile.render(turnstileRef.current, {
-        sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA",
+        sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "",
         theme: "dark",
         callback: (token: string) => { setTurnstileToken(token); setTurnstileReady(true); },
       });
@@ -129,9 +129,10 @@ export default function AuthPage() {
 
   const handleGoogle = async () => {
     setGoogleLoading(true);
+    const redirectTo = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin },
+      options: { redirectTo },
     });
     if (error) {
       toast({ title: "Google sign-in failed", description: error.message, variant: "destructive" });
@@ -145,8 +146,8 @@ export default function AuthPage() {
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <div className="rounded-2xl bg-card border border-border p-8">
             <div className="flex items-center justify-center gap-2 mb-6">
-              <Download className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">Anime<span className="text-primary">Stream</span></span>
+              <img src="/logo.png" alt="ApexAnime" className="h-10 w-10" />
+              <span className="text-2xl font-bold">Apex<span className="text-primary">Anime</span></span>
             </div>
 
             <h2 className="text-xl font-bold text-center mb-1">

@@ -102,7 +102,7 @@ export function AppSidebar() {
         ) : (
           <div className="flex justify-center">
             <Link href="/">
-              <img src="/logo.png" alt="ApexAnime" className="h-8 w-8" />
+              <img src="/logo.png" alt="ApexAnime" className="h-10 w-10" />
             </Link>
           </div>
         )}

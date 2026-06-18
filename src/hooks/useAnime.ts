@@ -1,12 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  getTopAnime,
-  getSeasonNow,
-  searchAnime,
-  getAnimeById,
-  getAnimeRecommendations,
-  getGenres,
-} from "@/lib/jikan";
+import * as anilist from "@/lib/anilist";
+import * as jikan from "@/lib/jikan";
 import { getEpisodesTrio } from "@/lib/animeData";
 
 export function useTopAnime(
@@ -15,16 +9,30 @@ export function useTopAnime(
 ) {
   return useQuery({
     queryKey: ["top-anime", filter, page],
-    queryFn: () => getTopAnime(page, filter),
-    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      try {
+        return await anilist.getTopAnime(page, filter);
+      } catch {
+        return jikan.getTopAnime(page, filter);
+      }
+    },
+    staleTime: 10 * 60 * 1000,
+    retry: 2,
   });
 }
 
 export function useSeasonNow(page = 1) {
   return useQuery({
     queryKey: ["season-now", page],
-    queryFn: () => getSeasonNow(page),
-    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      try {
+        return await anilist.getSeasonNow(page);
+      } catch {
+        return jikan.getSeasonNow(page);
+      }
+    },
+    staleTime: 10 * 60 * 1000,
+    retry: 2,
   });
 }
 
@@ -39,18 +47,32 @@ export function useSearchAnime(
 ) {
   return useQuery({
     queryKey: ["search-anime", query, page, genres, status, orderBy, sort, type],
-    queryFn: () => searchAnime(query, page, genres, status, orderBy, sort, type),
-    staleTime: 3 * 60 * 1000,
+    queryFn: async () => {
+      try {
+        return await anilist.searchAnime(query, page, genres, status, orderBy, sort, type);
+      } catch {
+        return jikan.searchAnime(query, page, genres, status, orderBy, sort, type);
+      }
+    },
+    staleTime: 5 * 60 * 1000,
     enabled: true,
+    retry: 2,
   });
 }
 
 export function useAnimeById(id: number) {
   return useQuery({
     queryKey: ["anime", id],
-    queryFn: () => getAnimeById(id),
+    queryFn: async () => {
+      try {
+        return await anilist.getAnimeById(id);
+      } catch {
+        return jikan.getAnimeById(id);
+      }
+    },
     staleTime: 10 * 60 * 1000,
     enabled: !!id,
+    retry: 2,
   });
 }
 
@@ -60,22 +82,37 @@ export function useAnimeEpisodes(id: number, page = 1) {
     queryFn: () => getEpisodesTrio(id, page),
     staleTime: 10 * 60 * 1000,
     enabled: !!id,
+    retry: 2,
   });
 }
 
 export function useAnimeRecommendations(id: number) {
   return useQuery({
     queryKey: ["anime-recommendations", id],
-    queryFn: () => getAnimeRecommendations(id),
+    queryFn: async () => {
+      try {
+        return await anilist.getAnimeRecommendations(id);
+      } catch {
+        return jikan.getAnimeRecommendations(id);
+      }
+    },
     staleTime: 10 * 60 * 1000,
     enabled: !!id,
+    retry: 2,
   });
 }
 
 export function useGenres() {
   return useQuery({
     queryKey: ["genres"],
-    queryFn: getGenres,
+    queryFn: async () => {
+      try {
+        return await anilist.getGenres();
+      } catch {
+        return jikan.getGenres();
+      }
+    },
     staleTime: 60 * 60 * 1000,
+    retry: 2,
   });
 }

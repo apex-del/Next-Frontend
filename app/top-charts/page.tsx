@@ -21,7 +21,7 @@ export default function TopCharts() {
   const { data, isLoading } = useTopAnime(filter, page);
 
   const animeList = data?.data || [];
-  const pagination = data?.pagination;
+  const pagination = (data as any)?.pagination;
 
   return (
     <Layout>
