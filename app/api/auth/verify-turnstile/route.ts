@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = 'edge';
 
-const TURNSTILE_SECRET = "0x4AAAAAADgXqWoxS1gNVQItuHm1HqjwmzI";
-
 export async function POST(request: NextRequest) {
   try {
     const { token } = await request.json();
@@ -11,8 +9,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Missing token" }, { status: 400 });
     }
 
+    const secret = process.env.TURNSTILE_SECRET_KEY;
+    if (!secret) {
+      return NextResponse.json({ success: false, error: "Turnstile secret not configured" }, { status: 500 });
+    }
+
     const formData = new FormData();
-    formData.append("secret", TURNSTILE_SECRET);
+    formData.append("secret", secret);
     formData.append("response", token);
 
     const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {

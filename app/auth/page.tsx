@@ -135,10 +135,7 @@ export default function AuthPage() {
     if (isSignUp) {
       const { error } = await signUp(email, password, displayName);
       if (error) toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
-      else {
-        toast({ title: "Account created!", description: "You can now sign in." });
-        setMode("signin");
-      }
+      else toast({ title: "Check your email!", description: "We sent you a confirmation link." });
     } else {
       const { error } = await signIn(email, password);
       if (error) toast({ title: "Sign in failed", description: error.message, variant: "destructive" });
