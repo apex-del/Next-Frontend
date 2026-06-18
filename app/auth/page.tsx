@@ -11,6 +11,9 @@ import { supabase } from "@/integrations/supabase/client";
 
 type Mode = "signin" | "signup" | "forgot";
 
+const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+const HAS_TURNSTILE = !!SITE_KEY;
+
 export default function AuthPage() {
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
@@ -19,7 +22,7 @@ export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [turnstileReady, setTurnstileReady] = useState(false);
+  const [turnstileReady, setTurnstileReady] = useState(!HAS_TURNSTILE);
   const [turnstileToken, setTurnstileToken] = useState("");
   const turnstileRef = useRef<HTMLDivElement>(null);
   const turnstileWidgetId = useRef<string | undefined>();
@@ -31,7 +34,7 @@ export default function AuthPage() {
   const isForgot = mode === "forgot";
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (!HAS_TURNSTILE || typeof window === "undefined") return;
     const script = document.createElement("script");
     script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
     script.async = true;
@@ -39,7 +42,7 @@ export default function AuthPage() {
     script.onload = () => {
       if (turnstileRef.current) {
         const id = (window as any).turnstile.render(turnstileRef.current, {
-          sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA",
+          sitekey: SITE_KEY,
           theme: "dark",
           callback: (token: string) => { setTurnstileToken(token); setTurnstileReady(true); },
         });
@@ -56,6 +59,7 @@ export default function AuthPage() {
   }, []);
 
   useEffect(() => {
+    if (!HAS_TURNSTILE) return;
     setTurnstileReady(false);
     setTurnstileToken("");
     if (turnstileWidgetId.current != null) {
@@ -64,7 +68,7 @@ export default function AuthPage() {
     }
     if (typeof window !== "undefined" && turnstileRef.current && (window as any).turnstile) {
       const id = (window as any).turnstile.render(turnstileRef.current, {
-        sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA",
+        sitekey: SITE_KEY,
         theme: "dark",
         callback: (token: string) => { setTurnstileToken(token); setTurnstileReady(true); },
       });
@@ -80,9 +84,8 @@ export default function AuthPage() {
   const handleForgot = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${siteUrl}/reset-password`,
+      redirectTo: `${window.location.origin}/reset-password`,
     });
     setLoading(false);
     if (error) {
@@ -134,10 +137,9 @@ export default function AuthPage() {
 
   const handleGoogle = async () => {
     setGoogleLoading(true);
-    const redirectTo = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo },
+      options: { redirectTo: window.location.origin },
     });
     if (error) {
       toast({ title: "Google sign-in failed", description: error.message, variant: "destructive" });
@@ -231,8 +233,8 @@ export default function AuthPage() {
                       </button>
                     </div>
                   )}
-                  <div ref={turnstileRef} className="flex justify-center" />
-                  <button type="submit" disabled={loading || !turnstileReady} className="w-full rounded-lg bg-primary py-3 font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+                  {HAS_TURNSTILE && <div ref={turnstileRef} className="flex justify-center" />}
+                  <button type="submit" disabled={loading || (HAS_TURNSTILE && !turnstileReady)} className="w-full rounded-lg bg-primary py-3 font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
                     {loading ? "Loading..." : isSignUp ? "Create Account" : "Sign In"}
                   </button>
                 </form>
