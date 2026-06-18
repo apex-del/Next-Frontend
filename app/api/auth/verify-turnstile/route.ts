@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = 'edge';
 
-const TURNSTILE_SECRET = "0x4AAAAAADgXqc_yRr7t_Y9QnTsQFNw5H0w";
+const TURNSTILE_SECRET = "0x4AAAAAADgXqWoxS1gNVQItuHm1HqjwmzI";
 
 export async function POST(request: NextRequest) {
   try {
