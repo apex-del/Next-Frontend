@@ -13,7 +13,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            retry: 2,
+            retry: 3,
+            retryDelay: (i) => Math.min(1000 * 2 ** i, 10000),
+            staleTime: 10 * 60 * 1000,
+            gcTime: 30 * 60 * 1000,
             refetchOnWindowFocus: false,
           },
         },

@@ -35,7 +35,7 @@ const sections = [
   {
     icon: Globe,
     title: "Third-Party Services",
-    content: "AnimeStream embeds video content from third-party hosting services such as Vidara, TurboVid, and others. These services may collect data, set cookies, or track users according to their own privacy policies. We do not control and are not responsible for their practices. We also use MyAnimeList's Jikan API for anime metadata.",
+    content: "ApexAnime embeds video content from third-party hosting services such as Vidara, TurboVid, and others. These services may collect data, set cookies, or track users according to their own privacy policies. We do not control and are not responsible for their practices. We also use MyAnimeList's Jikan API for anime metadata.",
   },
   {
     icon: Shield,
@@ -79,11 +79,11 @@ export default function PrivacyPage() {
             <div className="flex items-center gap-3 mb-4">
               <Download className="h-6 w-6 text-primary" />
               <span className="text-xl font-bold">
-                Anime<span className="text-primary">Stream</span>
+                Apex<span className="text-primary">Anime</span>
               </span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              AnimeStream respects your privacy. This policy explains what data we collect, why we collect it,
+              ApexAnime respects your privacy. This policy explains what data we collect, why we collect it,
               and how you can control it. We do <strong>not</strong> host or distribute any video files — all
               embedded content comes from third-party services.
             </p>
@@ -119,7 +119,7 @@ export default function PrivacyPage() {
               <div>
                 <h3 className="font-semibold mb-1">No Video Content Hosted</h3>
                 <p className="text-sm text-muted-foreground">
-                  AnimeStream does not store, host, or distribute any video files, episodes, or copyrighted
+                  ApexAnime does not store, host, or distribute any video files, episodes, or copyrighted
                   media. All video content is embedded from third-party services. We cannot control or be held
                   responsible for the content hosted on external platforms.
                 </p>

@@ -186,7 +186,7 @@ export default function AnimeDetailsClient({ animeId }: AnimeDetailsClientProps)
                   <ShareButton
                     variant="icon"
                     title={getDisplayTitle(anime)}
-                    text={`Check out ${getDisplayTitle(anime)} on AnimeStream`}
+                    text={`Check out ${getDisplayTitle(anime)} on ApexAnime`}
                   />
                 </div>
               </div>

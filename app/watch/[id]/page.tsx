@@ -214,7 +214,7 @@ function WatchContent() {
               <ShareButton
                 variant="icon"
                 title={`${getDisplayTitle(anime)} — Episode ${currentEp}`}
-                text={`Watch ${getDisplayTitle(anime)} Episode ${currentEp} on AnimeStream`}
+                text={`Watch ${getDisplayTitle(anime)} Episode ${currentEp} on ApexAnime`}
                 className="p-1.5"
               />
               <button

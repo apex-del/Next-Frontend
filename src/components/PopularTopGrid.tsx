@@ -31,6 +31,24 @@ export default function PopularTopGrid({ title, animeList, isLoading }: PopularT
     );
   }
 
+  if (!isLoading && animeList.length === 0) {
+    return (
+      <section className="py-8">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              {title}
+            </h2>
+          </div>
+          <div className="rounded-lg bg-card border border-border p-8 text-center">
+            <p className="text-muted-foreground">No data available. Try again later.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-8">
       <div className="container mx-auto px-4">

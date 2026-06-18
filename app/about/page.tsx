@@ -14,7 +14,7 @@ export default function About() {
             <div className="flex items-center gap-3 mb-6">
               <Download className="h-8 w-8 text-primary" />
               <h1 className="text-3xl md:text-4xl font-extrabold">
-                About Anime<span className="text-primary">Stream</span>
+                About Apex<span className="text-primary">Anime</span>
               </h1>
             </div>
 
@@ -22,10 +22,10 @@ export default function About() {
               <div className="rounded-xl bg-card border border-border p-6">
                 <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
                   <Info className="h-5 w-5 text-primary" />
-                  What is AnimeStream?
+                  What is ApexAnime?
                 </h2>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  AnimeStream is your ultimate anime discovery platform. Browse thousands of anime titles,
+                  ApexAnime is your ultimate anime discovery platform. Browse thousands of anime titles,
                   track your watching progress, save favorites, and discover new series through personalized
                   recommendations. Powered by the Jikan API (MyAnimeList), we provide comprehensive anime
                   data including synopses, ratings, episode lists, character info, and more.

@@ -36,7 +36,7 @@ export default function Footer() {
             <Link href="/" className="flex items-center gap-2 mb-4">
               <Download className="h-6 w-6 text-primary" />
               <span className="text-lg font-bold">
-                Anime<span className="text-primary">Stream</span>
+                Apex<span className="text-primary">Anime</span>
               </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">
@@ -81,7 +81,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-            <span>© {new Date().getFullYear()} AnimeStream.</span>
+            <span>© {new Date().getFullYear()} ApexAnime.</span>
             <Link href="/terms" className="hover:text-primary transition-colors">
               Terms
             </Link>

@@ -152,6 +152,25 @@ interface JikanResponse<T> {
   };
 }
 
+const CACHE_PREFIX = "apex_cache_";
+const CACHE_TTL = 10 * 60 * 1000;
+
+function cachedFetch<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
+  const cached = localStorage.getItem(CACHE_PREFIX + key);
+  if (cached) {
+    try {
+      const { data, expiry } = JSON.parse(cached);
+      if (Date.now() < expiry) return Promise.resolve(data);
+    } catch {}
+  }
+  return fetcher().then((data) => {
+    try {
+      localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({ data, expiry: Date.now() + CACHE_TTL }));
+    } catch {}
+    return data;
+  });
+}
+
 let lastRequest = 0;
 async function rateLimitedFetch(url: string): Promise<Response> {
   const now = Date.now();
@@ -173,17 +192,21 @@ export async function getTopAnime(
 ): Promise<JikanResponse<JikanAnime[]>> {
   const params = new URLSearchParams({ page: String(page), limit: "20" });
   if (filter) params.set("filter", filter);
-  const res = await rateLimitedFetch(`${BASE_URL}/top/anime?${params}`);
-  return res.json();
+  const cacheKey = `top-anime-${page}-${filter}`;
+  return cachedFetch(cacheKey, async () => {
+    const res = await rateLimitedFetch(`${BASE_URL}/top/anime?${params}`);
+    return res.json();
+  });
 }
 
 export async function getSeasonNow(
   page = 1
 ): Promise<JikanResponse<JikanAnime[]>> {
-  const res = await rateLimitedFetch(
-    `${BASE_URL}/seasons/now?page=${page}&limit=20`
-  );
-  return res.json();
+  const cacheKey = `season-now-${page}`;
+  return cachedFetch(cacheKey, async () => {
+    const res = await rateLimitedFetch(`${BASE_URL}/seasons/now?page=${page}&limit=20`);
+    return res.json();
+  });
 }
 
 export async function searchAnime(

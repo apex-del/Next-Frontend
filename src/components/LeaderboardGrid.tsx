@@ -29,6 +29,22 @@ export default function LeaderboardGrid({ title, animeList, isLoading }: Leaderb
     );
   }
 
+  if (!isLoading && animeList.length === 0) {
+    return (
+      <section className="py-6">
+        <div className="container mx-auto px-4">
+          <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2 mb-4">
+            <TrendingUp className="h-5 w-5 text-primary" />
+            {title}
+          </h2>
+          <div className="rounded-lg bg-card border border-border p-8 text-center">
+            <p className="text-muted-foreground">No data available. Try again later.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-6">
       <div className="container mx-auto px-4">

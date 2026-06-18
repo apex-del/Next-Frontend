@@ -9,17 +9,17 @@ const sections = [
   {
     icon: FileText,
     title: "Acceptance of Terms",
-    content: "By accessing or using AnimeStream, you agree to be bound by these Terms of Use and all applicable laws. If you do not agree with any part of these terms, you must not use our service.",
+    content: "By accessing or using ApexAnime, you agree to be bound by these Terms of Use and all applicable laws. If you do not agree with any part of these terms, you must not use our service.",
   },
   {
     icon: Ban,
     title: "No Hosting of Copyrighted Content",
-    content: "AnimeStream does not host, store, upload, or distribute any video files, episode files, or copyrighted media on its servers. All video content displayed on this website is embedded from third-party services and publicly available sources. We do not control the content hosted on these external platforms.",
+    content: "ApexAnime does not host, store, upload, or distribute any video files, episode files, or copyrighted media on its servers. All video content displayed on this website is embedded from third-party services and publicly available sources. We do not control the content hosted on these external platforms.",
   },
   {
     icon: AlertTriangle,
     title: "Disclaimer of Liability",
-    content: "AnimeStream is not responsible for the accuracy, legality, or availability of content embedded from third-party services. We do not guarantee that external links or embedded content will be uninterrupted, error-free, or free of harmful components. By using this site, you acknowledge that AnimeStream shall not be held liable for any damages arising from your use of embedded content or external links.",
+    content: "ApexAnime is not responsible for the accuracy, legality, or availability of content embedded from third-party services. We do not guarantee that external links or embedded content will be uninterrupted, error-free, or free of harmful components. By using this site, you acknowledge that ApexAnime shall not be held liable for any damages arising from your use of embedded content or external links.",
   },
   {
     icon: Shield,
@@ -29,12 +29,12 @@ const sections = [
   {
     icon: Scale,
     title: "User Conduct",
-    content: "You agree to use AnimeStream only for lawful purposes. You must not: (a) use the service to infringe upon intellectual property rights; (b) attempt to bypass security measures; (c) scrape, crawl, or automatedly collect data without authorization; (d) use the service for any illegal activity.",
+    content: "You agree to use ApexAnime only for lawful purposes. You must not: (a) use the service to infringe upon intellectual property rights; (b) attempt to bypass security measures; (c) scrape, crawl, or automatedly collect data without authorization; (d) use the service for any illegal activity.",
   },
   {
     icon: Scale,
     title: "Intellectual Property",
-    content: "All anime titles, images, and metadata displayed on AnimeStream are sourced from the Jikan API (MyAnimeList). All trademarks, logos, and character images belong to their respective owners. AnimeStream is not affiliated with or endorsed by any anime production studio or publisher.",
+    content: "All anime titles, images, and metadata displayed on ApexAnime are sourced from the Jikan API (MyAnimeList). All trademarks, logos, and character images belong to their respective owners. ApexAnime is not affiliated with or endorsed by any anime production studio or publisher.",
   },
   {
     icon: Shield,
@@ -55,7 +55,7 @@ export default function TermsPage() {
             </div>
             <p className="text-muted-foreground mb-2">Last updated: June 2026</p>
             <p className="text-sm text-muted-foreground mb-10">
-              Please read these terms carefully before using AnimeStream.
+              Please read these terms carefully before using ApexAnime.
             </p>
           </motion.div>
 
@@ -63,11 +63,11 @@ export default function TermsPage() {
             <div className="flex items-center gap-3 mb-4">
               <Download className="h-6 w-6 text-primary" />
               <span className="text-xl font-bold">
-                Anime<span className="text-primary">Stream</span>
+                Apex<span className="text-primary">Anime</span>
               </span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              AnimeStream is a free anime discovery and streaming directory. We aggregate publicly available
+              ApexAnime is a free anime discovery and streaming directory. We aggregate publicly available
               information and embed content from third-party video hosting services. We do not host,
               upload, or distribute any copyrighted media files. All content is provided for informational
               and entertainment purposes only.
@@ -104,7 +104,7 @@ export default function TermsPage() {
               <div>
                 <h3 className="font-semibold mb-1">Contact for Copyright Concerns</h3>
                 <p className="text-sm text-muted-foreground">
-                  If you believe any content on AnimeStream infringes your copyright, please contact the
+                  If you believe any content on ApexAnime infringes your copyright, please contact the
                   respective third-party hosting service directly. We do not host any files and cannot
                   remove content from external platforms. For inquiries, reach us at the contact page.
                 </p>

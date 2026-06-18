@@ -23,8 +23,8 @@ export default function ShareButton({ title, text, url, className, variant = "bu
   const [copied, setCopied] = useState(false);
 
   const shareUrl = url || (typeof window !== "undefined" ? window.location.href : "");
-  const shareTitle = title || "AnimeStream";
-  const shareText = text || title || "Check this out on AnimeStream";
+  const shareTitle = title || "ApexAnime";
+  const shareText = text || title || "Check this out on ApexAnime";
 
   const nativeShare = async () => {
     if (navigator.share) {

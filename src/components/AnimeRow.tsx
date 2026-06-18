@@ -51,22 +51,28 @@ export default function AnimeRow({
           </div>
         </div>
 
-        <div
-          ref={scrollRef}
-          className="flex gap-4 overflow-x-auto hide-scrollbar pb-2"
-        >
-          {isLoading
-            ? Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="w-[180px] shrink-0">
-                  <SkeletonCard />
-                </div>
-              ))
-            : animeList.map((anime, i) => (
-                <div key={anime.mal_id} className="w-[180px] shrink-0">
-                  <AnimeCard anime={anime} index={i} />
-                </div>
-              ))}
-        </div>
+        {!isLoading && animeList.length === 0 ? (
+          <div className="rounded-lg bg-card border border-border p-8 text-center">
+            <p className="text-muted-foreground">No data available. Try again later.</p>
+          </div>
+        ) : (
+          <div
+            ref={scrollRef}
+            className="flex gap-4 overflow-x-auto hide-scrollbar pb-2"
+          >
+            {isLoading
+              ? Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="w-[180px] shrink-0">
+                    <SkeletonCard />
+                  </div>
+                ))
+              : animeList.map((anime, i) => (
+                  <div key={anime.mal_id} className="w-[180px] shrink-0">
+                    <AnimeCard anime={anime} index={i} />
+                  </div>
+                ))}
+          </div>
+        )}
       </div>
     </section>
   );

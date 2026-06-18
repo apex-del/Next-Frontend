@@ -204,8 +204,8 @@ export default function ProfileContent() {
                         ) : null}
                         <ShareButton
                           variant="icon"
-                          title={`${profile?.display_name || "A user"} on AnimeStream`}
-                          text={`Check out ${profile?.display_name || "this profile"} on AnimeStream`}
+                          title={`${profile?.display_name || "A user"} on ApexAnime`}
+                          text={`Check out ${profile?.display_name || "this profile"} on ApexAnime`}
                         />
                       </div>
 

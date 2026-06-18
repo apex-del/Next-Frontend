@@ -93,16 +93,16 @@ export function AppSidebar() {
         {!collapsed ? (
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center gap-2">
-              <Download className="h-6 w-6 text-sidebar-primary shrink-0" />
+              <img src="/logo.png" alt="ApexAnime" className="h-8 w-8 shrink-0" />
               <span className="text-lg font-bold tracking-tight">
-                Anime<span className="text-sidebar-primary">Stream</span>
+                Apex<span className="text-sidebar-primary">Anime</span>
               </span>
             </Link>
           </div>
         ) : (
           <div className="flex justify-center">
             <Link href="/">
-              <Download className="h-6 w-6 text-sidebar-primary" />
+              <img src="/logo.png" alt="ApexAnime" className="h-8 w-8" />
             </Link>
           </div>
         )}

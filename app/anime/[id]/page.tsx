@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       openGraph: {
-        title: `${title} | AnimeStream`,
+        title: `${title} | ApexAnime`,
         description,
         type: "website",
         url: `/anime/${anime.mal_id}`,
@@ -45,14 +45,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
       twitter: {
         card: "summary_large_image",
-        title: `${title} | AnimeStream`,
+        title: `${title} | ApexAnime`,
         description,
         images: [imageUrl],
       },
       alternates: {
         canonical: `/anime/${anime.mal_id}`,
       },
-      other: { "og:site_name": "AnimeStream" },
+      other: { "og:site_name": "ApexAnime" },
     };
   } catch {
     return { title: "Anime Details" };

@@ -56,7 +56,7 @@ async function fetchWithCache(
 
   const response = await fetch(url, {
     headers: {
-      "User-Agent": "AnimeStreamHub/1.0",
+      "User-Agent": "ApexAnime/1.0",
     },
   });
 
