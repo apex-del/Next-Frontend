@@ -11,8 +11,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 type Mode = "signin" | "signup" | "forgot";
 
-const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-const HAS_TURNSTILE = !!SITE_KEY;
+const SITE_KEY = "0x4AAAAAADgXqclxZv_6ufbv";
+const HAS_TURNSTILE = true;
 
 export default function AuthPage() {
   const [mode, setMode] = useState<Mode>("signin");
@@ -35,11 +35,13 @@ export default function AuthPage() {
 
   useEffect(() => {
     if (!HAS_TURNSTILE || typeof window === "undefined") return;
+    const timeout = setTimeout(() => setTurnstileReady(true), 10000);
     const script = document.createElement("script");
     script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
     script.async = true;
     script.defer = true;
     script.onload = () => {
+      clearTimeout(timeout);
       if (turnstileRef.current) {
         const id = (window as any).turnstile.render(turnstileRef.current, {
           sitekey: SITE_KEY,
@@ -51,6 +53,7 @@ export default function AuthPage() {
     };
     document.head.appendChild(script);
     return () => {
+      clearTimeout(timeout);
       if (turnstileWidgetId.current != null) {
         (window as any).turnstile?.remove(turnstileWidgetId.current);
       }
@@ -104,10 +107,8 @@ export default function AuthPage() {
 
   const verifyTurnstile = async (): Promise<boolean> => {
     if (!turnstileToken) return true;
-    const workerUrl = process.env.NEXT_PUBLIC_WORKER_URL;
-    if (!workerUrl) return true;
     try {
-      const verify = await fetch(`${workerUrl}/api/turnstile/verify`, {
+      const verify = await fetch("/api/auth/verify-turnstile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: turnstileToken }),
