@@ -83,7 +83,7 @@ async function apiFetch(table: string, params: URLSearchParams): Promise<any[]> 
   } catch {}
   // Fallback to FZR
   try {
-    const headers = { apikey: FZR_KEY, Authorization: `Bearer ${FZR_KEY}` };
+    const headers = { apikey: FZR_KEY };
     const res = await fetch(`${FZR_URL}/rest/v1/${table}?${params}`, { headers });
     if (!res.ok) return [];
     return res.json();

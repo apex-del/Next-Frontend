@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { Download, Github, Twitter, Heart } from "lucide-react";
 
@@ -27,6 +30,20 @@ const footerLinks = {
 };
 
 export default function Footer() {
+  const kofiRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!kofiRef.current || (window as any).kofiwidget2) return;
+    const script = document.createElement("script");
+    script.src = "https://storage.ko-fi.com/cdn/widget/Widget_2.js";
+    script.onload = () => {
+      (window as any).kofiwidget2.init("Support Us", "#000000", "L5O820YNA7");
+      (window as any).kofiwidget2.draw(kofiRef.current);
+    };
+    document.body.appendChild(script);
+    return () => { script.remove(); };
+  }, []);
+
   return (
     <footer className="border-t border-border bg-card/50">
       <div className="container mx-auto px-4 py-12">
@@ -92,9 +109,12 @@ export default function Footer() {
               Built with <Heart className="inline h-3 w-3 text-primary fill-primary" /> using Jikan API.
             </span>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Data sourced from MyAnimeList via Jikan API. Not affiliated with MAL.
-          </p>
+          <div className="flex items-center gap-3">
+            <div ref={kofiRef} />
+            <p className="text-xs text-muted-foreground">
+              Data sourced from MyAnimeList via Jikan API. Not affiliated with MAL.
+            </p>
+          </div>
         </div>
       </div>
     </footer>
