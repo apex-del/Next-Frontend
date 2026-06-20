@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Settings as SettingsIcon, User, LogOut, Shield, Bell, Cookie, Globe, Lock } from "lucide-react";
+import {
+  Settings as SettingsIcon, User, LogOut, Shield, Bell, Cookie,
+  Globe, Lock, Monitor, Wifi, Link2, Languages, Play, RotateCcw,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
+import { usePreferences } from "@/hooks/usePreferences";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +32,7 @@ export default function SettingsPage() {
   const { data: profile } = useProfile();
   const updateProfile = useUpdateProfile();
   const [savingPrivacy, setSavingPrivacy] = useState(false);
+  const { preferences, updatePreference, resetPreferences } = usePreferences();
 
   if (!user) {
     return (
@@ -99,10 +104,152 @@ export default function SettingsPage() {
 
             <div className="rounded-xl bg-card border border-border p-6">
               <h3 className="font-semibold mb-4 flex items-center gap-2">
-                <Bell className="h-4 w-4 text-primary" />
-                Preferences
+                <Monitor className="h-4 w-4 text-primary" />
+                Playback
               </h3>
-              <p className="text-sm text-muted-foreground">Notification and theme settings coming soon.</p>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Preferred server</p>
+                    <p className="text-xs text-muted-foreground">Source for streaming episodes</p>
+                  </div>
+                  <select
+                    value={preferences.preferredServer}
+                    onChange={(e) => updatePreference("preferredServer", e.target.value)}
+                    className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-sm"
+                  >
+                    <option value="auto">Auto</option>
+                    <option value="turbovid">TurboVid</option>
+                    <option value="vidara">Vidara</option>
+                    <option value="abyss">Abyss</option>
+                  </select>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Episode type</p>
+                    <p className="text-xs text-muted-foreground">Sub or Dub</p>
+                  </div>
+                  <select
+                    value={preferences.episodeType}
+                    onChange={(e) => updatePreference("episodeType", e.target.value)}
+                    className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-sm"
+                  >
+                    <option value="sub">Sub</option>
+                    <option value="dub">Dub</option>
+                    <option value="both">Both</option>
+                  </select>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Default quality</p>
+                    <p className="text-xs text-muted-foreground">Preferred video quality</p>
+                  </div>
+                  <select
+                    value={preferences.defaultQuality}
+                    onChange={(e) => updatePreference("defaultQuality", e.target.value)}
+                    className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-sm"
+                  >
+                    <option value="auto">Auto</option>
+                    <option value="1080p">1080p</option>
+                    <option value="720p">720p</option>
+                    <option value="480p">480p</option>
+                    <option value="360p">360p</option>
+                  </select>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Stream source</p>
+                    <p className="text-xs text-muted-foreground">Preferred embed player</p>
+                  </div>
+                  <select
+                    value={preferences.defaultStreamSource}
+                    onChange={(e) => updatePreference("defaultStreamSource", e.target.value)}
+                    className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-sm"
+                  >
+                    <option value="auto">Auto</option>
+                    <option value="vidplay">Vidplay</option>
+                    <option value="megacloud">MegaCloud</option>
+                    <option value="streamtape">StreamTape</option>
+                  </select>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Auto-play</p>
+                    <p className="text-xs text-muted-foreground">Auto-play next episode</p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={preferences.autoPlay}
+                    onClick={() => updatePreference("autoPlay", !preferences.autoPlay)}
+                    className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${
+                      preferences.autoPlay ? "bg-primary" : "bg-secondary"
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-1 h-5 w-5 rounded-full bg-background transition-transform ${
+                        preferences.autoPlay ? "translate-x-5" : "left-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-xl bg-card border border-border p-6">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Wifi className="h-4 w-4 text-primary" />
+                Downloads
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Link shortener</p>
+                    <p className="text-xs text-muted-foreground">Use shortened links for downloads</p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={preferences.linkShortener}
+                    onClick={() => updatePreference("linkShortener", !preferences.linkShortener)}
+                    className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${
+                      preferences.linkShortener ? "bg-primary" : "bg-secondary"
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-1 h-5 w-5 rounded-full bg-background transition-transform ${
+                        preferences.linkShortener ? "translate-x-5" : "left-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-xl bg-card border border-border p-6">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Languages className="h-4 w-4 text-primary" />
+                Subtitles
+              </h3>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium">Default subtitle language</p>
+                  <p className="text-xs text-muted-foreground">Language for episode subtitles</p>
+                </div>
+                <select
+                  value={preferences.subtitleLanguage}
+                  onChange={(e) => updatePreference("subtitleLanguage", e.target.value)}
+                  className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-sm"
+                >
+                  <option value="english">English</option>
+                  <option value="japanese">Japanese</option>
+                  <option value="spanish">Spanish</option>
+                  <option value="french">French</option>
+                  <option value="german">German</option>
+                  <option value="arabic">Arabic</option>
+                  <option value="hindi">Hindi</option>
+                </select>
+              </div>
             </div>
 
             <div className="rounded-xl bg-card border border-border p-6">
@@ -152,6 +299,14 @@ export default function SettingsPage() {
                 We use cookies and your session to keep you signed in, remember consent, and keep your account secure across visits.
               </p>
             </div>
+
+            <button
+              onClick={() => { resetPreferences(); toast({ title: "Preferences reset to defaults" }); }}
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-secondary/40 border border-border p-4 font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Reset all preferences
+            </button>
 
             <AlertDialog>
               <AlertDialogTrigger asChild>
