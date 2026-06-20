@@ -73,6 +73,7 @@ export default function Footer() {
                 <Github className="h-4 w-4" />
               </a>
             </div>
+            <div ref={kofiRef} className="mt-4" />
           </div>
 
           {/* Link groups */}
@@ -110,7 +111,6 @@ export default function Footer() {
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <div ref={kofiRef} />
             <p className="text-xs text-muted-foreground">
               Data sourced from MyAnimeList via Jikan API. Not affiliated with MAL.
             </p>
