@@ -2,6 +2,8 @@ import Link from "next/link";
 import Script from "next/script";
 import { Download, Github, Twitter, Heart } from "lucide-react";
 
+declare const kofiwidget2: { init: (label: string, bg: string, id: string) => void; draw: () => void };
+
 const footerLinks = {
   Browse: [
     { label: "Trending", href: "/browse?sort=popularity" },

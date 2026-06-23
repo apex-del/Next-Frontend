@@ -19,7 +19,7 @@ export default function NotFound() {
         loop
         playsInline
         preload="auto"
-        className="fixed inset-0 w-full h-full object-cover z-0"
+        className="fixed inset-0 w-full h-full object-contain z-0"
       >
         <source src="https://files.catbox.moe/b96o7h.mp4" type="video/mp4" />
       </video>
