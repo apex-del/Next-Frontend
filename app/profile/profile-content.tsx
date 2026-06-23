@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   User, Camera, Heart, MessageSquare, Edit2, Save, X, Check,
@@ -17,7 +17,6 @@ import FollowListDialog from "@/components/FollowListDialog";
 import ShareButton from "@/components/ShareButton";
 import { supabase } from "@/integrations/supabase/client";
 import { makeAnimeSlug } from "@/lib/slug";
-import { getAniListMedia } from "@/lib/anilist";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
@@ -449,26 +448,6 @@ function EmptyState({ text }: { text: string }) {
 function AnimeGrid({
   title, items, flat, empty, subKey,
 }: { title?: string; items: any[]; flat?: boolean; empty?: string; subKey?: string }) {
-  const [epThumbs, setEpThumbs] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    const fetchThumbs = async () => {
-      const results: Record<string, string> = {};
-      const promises = items.map(async (a) => {
-        if (!a.anime_id || !subKey || a[subKey] == null) return;
-        const key = `${a.anime_id}-${a[subKey]}`;
-        try {
-          const media = await getAniListMedia(a.anime_id);
-          const ep = media?.streamingEpisodes?.[a[subKey] - 1];
-          if (ep?.thumbnail) results[key] = ep.thumbnail;
-        } catch {}
-      });
-      await Promise.allSettled(promises);
-      setEpThumbs(results);
-    };
-    if (subKey) fetchThumbs();
-  }, [items, subKey]);
-
   if (!items.length) {
     if (flat) return <EmptyState text={empty || "Nothing here yet."} />;
     return null;
@@ -477,32 +456,18 @@ function AnimeGrid({
     <div>
       {title && <h2 className="text-lg font-bold mb-3">{title}</h2>}
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-        {items.map((a: any) => {
-          const thumbKey = subKey && a[subKey] != null ? `${a.anime_id}-${a[subKey]}` : null;
-          const hasThumb = thumbKey && epThumbs[thumbKey];
-          return (
+        {items.map((a: any) => (
           <Link key={a.id} href={`/anime/${makeAnimeSlug(a.anime_title, a.anime_id)}`} className="block group">
-            {hasThumb ? (
-              <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden group-hover:scale-[1.03] transition-transform">
-                <img src={epThumbs[thumbKey!]} alt={a.anime_title} loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-1">
-                  <span className="text-[10px] font-bold text-white drop-shadow-md">Ep {a[subKey]}</span>
-                </div>
-              </div>
-            ) : (
-              a.anime_image && (
-                <img src={a.anime_image} alt={a.anime_title} loading="lazy"
-                  className="w-full aspect-[3/4] rounded-lg object-cover group-hover:scale-[1.03] transition-transform" />
-              )
+            {a.anime_image && (
+              <img src={a.anime_image} alt={a.anime_title} loading="lazy"
+                className="w-full aspect-[3/4] rounded-lg object-cover group-hover:scale-[1.03] transition-transform" />
             )}
             <p className="mt-1.5 text-xs line-clamp-2 group-hover:text-primary transition-colors">{a.anime_title}</p>
-            {subKey && a[subKey] != null && !hasThumb && (
+            {subKey && a[subKey] != null && (
               <p className="text-[10px] text-muted-foreground">Ep {a[subKey]}</p>
             )}
           </Link>
-          );
-        })}
+        ))}
       </div>
     </div>
   );
