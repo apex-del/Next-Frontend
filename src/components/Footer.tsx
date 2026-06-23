@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Download, Github, Twitter, Heart, Coffee } from "lucide-react";
+import { Download, Github, Twitter, Heart } from "lucide-react";
 
 const footerLinks = {
   Browse: [
@@ -96,13 +96,6 @@ export default function Footer() {
             <p className="text-xs text-muted-foreground">
               Data sourced from MyAnimeList via Jikan API. Not affiliated with MAL.
             </p>
-            <Link
-              href="/support"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FF5E5B]/10 text-[#FF5E5B] hover:bg-[#FF5E5B]/20 text-xs font-medium transition-colors"
-            >
-              <Coffee className="h-3.5 w-3.5" />
-              Support Us
-            </Link>
           </div>
         </div>
       </div>
