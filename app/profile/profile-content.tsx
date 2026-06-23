@@ -446,35 +446,29 @@ function EmptyState({ text }: { text: string }) {
   );
 }
 
-function EpisodeImage({ animeId, episodeNumber, fallback, alt }: {
-  animeId: number; episodeNumber: number; fallback: string; alt: string;
-}) {
-  const [thumb, setThumb] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    getAniListMedia(animeId).then((media) => {
-      if (cancelled || !media?.streamingEpisodes?.length) return;
-      const ep = media.streamingEpisodes[episodeNumber - 1];
-      if (ep?.thumbnail) setThumb(ep.thumbnail);
-    }).catch(() => {});
-    return () => { cancelled = true; };
-  }, [animeId, episodeNumber]);
-
-  return (
-    <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden group-hover:scale-[1.03] transition-transform">
-      <img src={thumb || fallback} alt={alt} loading="lazy"
-        className="absolute inset-0 w-full h-full object-cover" />
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-1">
-        <span className="text-[10px] font-bold text-white drop-shadow-md">Ep {episodeNumber}</span>
-      </div>
-    </div>
-  );
-}
-
 function AnimeGrid({
   title, items, flat, empty, subKey,
 }: { title?: string; items: any[]; flat?: boolean; empty?: string; subKey?: string }) {
+  const [epThumbs, setEpThumbs] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const fetchThumbs = async () => {
+      const results: Record<string, string> = {};
+      const promises = items.map(async (a) => {
+        if (!a.anime_id || !subKey || a[subKey] == null) return;
+        const key = `${a.anime_id}-${a[subKey]}`;
+        try {
+          const media = await getAniListMedia(a.anime_id);
+          const ep = media?.streamingEpisodes?.[a[subKey] - 1];
+          if (ep?.thumbnail) results[key] = ep.thumbnail;
+        } catch {}
+      });
+      await Promise.allSettled(promises);
+      setEpThumbs(results);
+    };
+    if (subKey) fetchThumbs();
+  }, [items, subKey]);
+
   if (!items.length) {
     if (flat) return <EmptyState text={empty || "Nothing here yet."} />;
     return null;
@@ -483,15 +477,19 @@ function AnimeGrid({
     <div>
       {title && <h2 className="text-lg font-bold mb-3">{title}</h2>}
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-        {items.map((a: any) => (
+        {items.map((a: any) => {
+          const thumbKey = subKey && a[subKey] != null ? `${a.anime_id}-${a[subKey]}` : null;
+          const hasThumb = thumbKey && epThumbs[thumbKey];
+          return (
           <Link key={a.id} href={`/anime/${makeAnimeSlug(a.anime_title, a.anime_id)}`} className="block group">
-            {a.anime_image && subKey && a[subKey] != null ? (
-              <EpisodeImage
-                animeId={a.anime_id}
-                episodeNumber={a[subKey]}
-                fallback={a.anime_image}
-                alt={a.anime_title}
-              />
+            {hasThumb ? (
+              <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden group-hover:scale-[1.03] transition-transform">
+                <img src={epThumbs[thumbKey!]} alt={a.anime_title} loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-1">
+                  <span className="text-[10px] font-bold text-white drop-shadow-md">Ep {a[subKey]}</span>
+                </div>
+              </div>
             ) : (
               a.anime_image && (
                 <img src={a.anime_image} alt={a.anime_title} loading="lazy"
@@ -499,11 +497,12 @@ function AnimeGrid({
               )
             )}
             <p className="mt-1.5 text-xs line-clamp-2 group-hover:text-primary transition-colors">{a.anime_title}</p>
-            {subKey && a[subKey] != null && !a.anime_image && (
+            {subKey && a[subKey] != null && !hasThumb && (
               <p className="text-[10px] text-muted-foreground">Ep {a[subKey]}</p>
             )}
           </Link>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

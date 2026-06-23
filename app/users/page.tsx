@@ -15,7 +15,6 @@ interface PublicUser {
 }
 
 export default function UsersPage() {
-  const router = useRouter();
   const [query, setQuery] = useState("");
   const [allUsers, setAllUsers] = useState<PublicUser[]>([]);
   const [loading, setLoading] = useState(true);
