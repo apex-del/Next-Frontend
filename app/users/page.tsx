@@ -16,6 +16,7 @@ interface PublicUser {
 
 export default function UsersPage() {
   const [query, setQuery] = useState("");
+  const [searchedQuery, setSearchedQuery] = useState("");
   const [allUsers, setAllUsers] = useState<PublicUser[]>([]);
   const [loading, setLoading] = useState(true);
   const workerUrl = process.env.NEXT_PUBLIC_WORKER_URL || "";
@@ -28,9 +29,14 @@ export default function UsersPage() {
       .finally(() => setLoading(false));
   }, [workerUrl]);
 
-  const filtered = query.trim()
+  const doSearch = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    setSearchedQuery(query.trim());
+  };
+
+  const filtered = searchedQuery
     ? allUsers.filter((u) => {
-        const q = query.trim().toLowerCase();
+        const q = searchedQuery.toLowerCase();
         return (
           u.display_name?.toLowerCase().includes(q) ||
           u.user_id.toLowerCase().includes(q) ||
@@ -39,6 +45,8 @@ export default function UsersPage() {
       })
     : allUsers;
 
+  const hasSearched = !!searchedQuery;
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-10 max-w-2xl">
@@ -46,22 +54,30 @@ export default function UsersPage() {
           <User className="h-12 w-12 mx-auto mb-4 text-primary" />
           <h1 className="text-3xl font-extrabold">Find Users</h1>
           <p className="text-muted-foreground mt-2">
-            Search by display name or user ID &mdash; results update as you type
+            Search by display name or user ID
           </p>
           <p className="text-xs text-muted-foreground/60 mt-1">
             Your user ID is shown on your profile page next to your name &mdash; click it to copy
           </p>
         </div>
 
-        <div className="relative mb-8">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by name or user ID..."
-            className="w-full rounded-xl bg-secondary pl-10 pr-4 py-3 text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
+        <form onSubmit={doSearch} className="flex gap-2 mb-8">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by name or user ID..."
+              className="w-full rounded-xl bg-secondary pl-10 pr-4 py-3 text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+          <button
+            type="submit"
+            className="rounded-xl bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors shrink-0"
+          >
+            Search
+          </button>
+        </form>
 
         <div className="space-y-3">
           {loading ? (
@@ -70,15 +86,16 @@ export default function UsersPage() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-10 text-muted-foreground">
-              <p>{query.trim() ? "No users match your search" : "No public profiles found"}</p>
+              <p>{hasSearched ? "No users match your search" : "No public profiles found"}</p>
               <p className="text-sm mt-1">Set your profile to public in settings to appear here</p>
             </div>
           ) : (
             <>
-              <p className="text-sm text-muted-foreground font-medium">
-                {filtered.length} result{filtered.length !== 1 ? "s" : ""}
-                {query.trim() && ` for "${query.trim()}"`}
-              </p>
+              {hasSearched && (
+                <p className="text-sm text-muted-foreground font-medium">
+                  {filtered.length} result{filtered.length !== 1 ? "s" : ""} for &quot;{searchedQuery}&quot;
+                </p>
+              )}
               {filtered.map((u) => (
                 <Link
                   key={u.user_id}

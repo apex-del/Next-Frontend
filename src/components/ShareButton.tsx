@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Share2, Check, Copy, Twitter, Facebook, Send } from "lucide-react";
+import { Share2, Check, Copy, Twitter, Facebook, Send, MessageCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -113,6 +113,15 @@ export default function ShareButton({ title, text, url, className, variant = "bu
             rel="noopener noreferrer"
           >
             <Facebook className="h-4 w-4" /> Facebook
+          </a>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(shareText + " " + shareUrl)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <MessageCircle className="h-4 w-4" /> WhatsApp
           </a>
         </DropdownMenuItem>
       </DropdownMenuContent>
