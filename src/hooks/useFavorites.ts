@@ -5,27 +5,6 @@ import type { JikanAnime } from "@/lib/jikan";
 import { getDisplayTitle } from "@/lib/jikan";
 import { useToast } from "@/hooks/use-toast";
 
-const workerUrl = process.env.NEXT_PUBLIC_WORKER_URL || "";
-
-async function fetchWithAuth(path: string, options: RequestInit = {}) {
-  const { data: { session } } = await supabase.auth.getSession();
-  const token = session?.access_token;
-  if (!token) throw new Error("Not authenticated");
-  const res = await fetch(`${workerUrl}${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      ...options.headers,
-    },
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || `HTTP ${res.status}`);
-  }
-  return res.json();
-}
-
 export function useFavorites() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -35,8 +14,13 @@ export function useFavorites() {
     queryKey: ["favorites", user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const data = await fetchWithAuth("/api/favorites");
-      return Array.isArray(data) ? data : [];
+      const { data, error } = await supabase
+        .from("favorites" as any)
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as any[];
     },
     enabled: !!user,
   });
@@ -44,28 +28,33 @@ export function useFavorites() {
   const addFavorite = useMutation({
     mutationFn: async (anime: JikanAnime) => {
       if (!user) throw new Error("Must be logged in");
-      await fetchWithAuth("/api/favorites", {
-        method: "POST",
-        body: JSON.stringify({
-          user_id: user.id,
-          anime_id: anime.mal_id,
-          anime_title: getDisplayTitle(anime),
-          anime_image: anime.images?.webp?.large_image_url || anime.images?.jpg?.large_image_url,
-          anime_score: anime.score,
-          anime_type: anime.type,
-          anime_year: anime.year,
-        }),
-      });
+      const { error } = await supabase.from("favorites" as any).insert({
+        user_id: user.id,
+        anime_id: anime.mal_id,
+        anime_title: getDisplayTitle(anime),
+        anime_image: anime.images?.webp?.large_image_url || anime.images?.jpg?.large_image_url,
+        anime_score: anime.score,
+        anime_type: anime.type,
+        anime_year: anime.year,
+      } as any);
+      if (error) {
+        if (error.message?.includes("duplicate") || error.code === "23505") {
+          throw { message: "duplicate" };
+        }
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["favorites"] });
       toast({ title: "Added to favorites ❤️" });
     },
     onError: (err: any) => {
-      if (err.message?.includes("duplicate")) {
+      if (err?.message?.includes("duplicate") || err?.code === "23505") {
         toast({ title: "Already in favorites", variant: "destructive" });
+      } else if (err?.message?.includes("row-level security") || err?.code?.startsWith("42")) {
+        toast({ title: "Database RLS policy missing", description: "Run the RLS migration in Supabase dashboard", variant: "destructive" });
       } else {
-        toast({ title: "Failed to add favorite", variant: "destructive" });
+        toast({ title: "Failed to add favorite", description: err?.message || "", variant: "destructive" });
       }
     },
   });
@@ -73,10 +62,12 @@ export function useFavorites() {
   const removeFavorite = useMutation({
     mutationFn: async (animeId: number) => {
       if (!user) throw new Error("Must be logged in");
-      await fetchWithAuth("/api/favorites", {
-        method: "DELETE",
-        body: JSON.stringify({ anime_id: animeId }),
-      });
+      const { error } = await supabase
+        .from("favorites" as any)
+        .delete()
+        .eq("user_id", user.id)
+        .eq("anime_id", animeId);
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["favorites"] });
