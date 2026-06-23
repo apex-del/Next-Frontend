@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Search, User, ArrowRight, Loader2 } from "lucide-react";
 import Layout from "@/components/Layout";
@@ -16,36 +16,27 @@ interface PublicUser {
 
 export default function UsersPage() {
   const [query, setQuery] = useState("");
-  const [searchedQuery, setSearchedQuery] = useState("");
-  const [allUsers, setAllUsers] = useState<PublicUser[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState<PublicUser[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const workerUrl = process.env.NEXT_PUBLIC_WORKER_URL || "";
 
-  useEffect(() => {
-    fetch(`${workerUrl}/api/users/search`)
-      .then((r) => r.json())
-      .then((data) => setAllUsers(Array.isArray(data) ? data : []))
-      .catch(() => setAllUsers([]))
-      .finally(() => setLoading(false));
-  }, [workerUrl]);
-
-  const doSearch = (e?: React.FormEvent) => {
+  const doSearch = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    setSearchedQuery(query.trim());
+    const q = query.trim();
+    if (!q) return;
+    setLoading(true);
+    setHasSearched(true);
+    try {
+      const res = await fetch(`${workerUrl}/api/users/search?q=${encodeURIComponent(q)}&limit=50`);
+      const data = await res.json();
+      setUsers(Array.isArray(data) ? data : []);
+    } catch {
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
   };
-
-  const filtered = searchedQuery
-    ? allUsers.filter((u) => {
-        const q = searchedQuery.toLowerCase();
-        return (
-          u.display_name?.toLowerCase().includes(q) ||
-          u.user_id.toLowerCase().includes(q) ||
-          u.bio?.toLowerCase().includes(q)
-        );
-      })
-    : allUsers;
-
-  const hasSearched = !!searchedQuery;
 
   return (
     <Layout>
@@ -84,19 +75,17 @@ export default function UsersPage() {
             <div className="flex justify-center py-10">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
-          ) : filtered.length === 0 ? (
+          ) : users.length === 0 ? (
             <div className="text-center py-10 text-muted-foreground">
-              <p>{hasSearched ? "No users match your search" : "No public profiles found"}</p>
-              <p className="text-sm mt-1">Set your profile to public in settings to appear here</p>
+              <p>No users match your search</p>
+              <p className="text-sm mt-1">Try a different name or user ID</p>
             </div>
           ) : (
             <>
-              {hasSearched && (
-                <p className="text-sm text-muted-foreground font-medium">
-                  {filtered.length} result{filtered.length !== 1 ? "s" : ""} for &quot;{searchedQuery}&quot;
-                </p>
-              )}
-              {filtered.map((u) => (
+              <p className="text-sm text-muted-foreground font-medium">
+                {users.length} result{users.length !== 1 ? "s" : ""} for &quot;{query.trim()}&quot;
+              </p>
+              {users.map((u) => (
                 <Link
                   key={u.user_id}
                   href={`/profile/${u.user_id}`}
