@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Script from "next/script";
 import { Download, Github, Twitter, Heart } from "lucide-react";
 
 const footerLinks = {
@@ -96,9 +97,21 @@ export default function Footer() {
             <p className="text-xs text-muted-foreground">
               Data sourced from MyAnimeList via Jikan API. Not affiliated with MAL.
             </p>
+            <div id="kofi-widget" />
           </div>
         </div>
       </div>
+
+      <Script
+        src="https://storage.ko-fi.com/cdn/widget/Widget_2.js"
+        strategy="lazyOnload"
+        onLoad={() => {
+          try {
+            kofiwidget2.init("Support Us 💪🏻", "#000000", "L5O820YNA7");
+            kofiwidget2.draw();
+          } catch {}
+        }}
+      />
     </footer>
   );
 }

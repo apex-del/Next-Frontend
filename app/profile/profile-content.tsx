@@ -260,6 +260,18 @@ export default function ProfileContent() {
                         <h1 className="text-2xl sm:text-3xl font-extrabold">
                           {profile?.display_name || "Unnamed user"}
                         </h1>
+                        {ownerId && (
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(ownerId);
+                              toast({ title: "User ID copied", description: ownerId });
+                            }}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                            title="Click to copy your user ID"
+                          >
+                            ID: {ownerId.length > 12 ? ownerId.slice(0, 12) + "..." : ownerId}
+                          </button>
+                        )}
                         {isOwn ? (
                           <button onClick={startEdit}
                             className="p-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-secondary transition-colors">

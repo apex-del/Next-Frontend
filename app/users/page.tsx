@@ -45,6 +45,9 @@ export default function UsersPage() {
           <p className="text-muted-foreground mt-2">
             Search by display name, or enter a user ID to go directly to their profile
           </p>
+          <p className="text-xs text-muted-foreground/60 mt-1">
+            Your user ID is shown on your profile page next to your name &mdash; click it to copy
+          </p>
         </div>
 
         <form onSubmit={handleSearch} className="relative mb-8">
