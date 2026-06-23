@@ -20,27 +20,20 @@ export default function UsersPage() {
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState<PublicUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const workerUrl = process.env.NEXT_PUBLIC_WORKER_URL || "";
 
   useEffect(() => {
-    fetch("/api/users/search")
+    fetch(`${workerUrl}/api/users/search`)
       .then((r) => r.json())
       .then((data) => setUsers(Array.isArray(data) ? data : []))
       .catch(() => setUsers([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [workerUrl]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const q = query.trim();
     if (q) router.push(`/profile/${encodeURIComponent(q)}`);
-  };
-
-  const handleNameSearch = (name: string) => {
-    setQuery(name);
-    fetch(`/api/users/search?q=${encodeURIComponent(name)}`)
-      .then((r) => r.json())
-      .then((data) => setUsers(Array.isArray(data) ? data : []))
-      .catch(() => {});
   };
 
   return (
