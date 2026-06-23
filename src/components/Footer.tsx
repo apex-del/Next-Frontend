@@ -1,8 +1,5 @@
 import Link from "next/link";
-import Script from "next/script";
-import { Download, Github, Twitter, Heart } from "lucide-react";
-
-declare const kofiwidget2: { init: (label: string, bg: string, id: string) => void; draw: () => void };
+import { Download, Github, Twitter, Heart, Coffee } from "lucide-react";
 
 const footerLinks = {
   Browse: [
@@ -99,21 +96,17 @@ export default function Footer() {
             <p className="text-xs text-muted-foreground">
               Data sourced from MyAnimeList via Jikan API. Not affiliated with MAL.
             </p>
-            <div id="kofi-widget" />
+            <Link
+              href="/support"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FF5E5B]/10 text-[#FF5E5B] hover:bg-[#FF5E5B]/20 text-xs font-medium transition-colors"
+            >
+              <Coffee className="h-3.5 w-3.5" />
+              Support Us
+            </Link>
           </div>
         </div>
       </div>
 
-      <Script
-        src="https://storage.ko-fi.com/cdn/widget/Widget_2.js"
-        strategy="lazyOnload"
-        onLoad={() => {
-          try {
-            kofiwidget2.init("Support Us 💪🏻", "#000000", "L5O820YNA7");
-            kofiwidget2.draw();
-          } catch {}
-        }}
-      />
     </footer>
   );
 }
