@@ -162,9 +162,11 @@ export default function Navbar() {
                       {initial}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="text-sm font-medium hidden md:inline truncate max-w-[100px]">
-                    {profile?.display_name ?? user.email?.split("@")[0]}
-                  </span>
+                  {profile?.display_name && (
+                    <span className="text-sm font-medium hidden md:inline truncate max-w-[100px]">
+                      {profile.display_name}
+                    </span>
+                  )}
                 </Link>
               ) : (
                 <Link
