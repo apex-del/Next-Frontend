@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, X, Download, Heart, LogIn } from "lucide-react";
+import { Search, X, Download, Heart, LogIn, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,6 +17,8 @@ export default function Navbar() {
   const { data: profile } = useProfile();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [userSearchOpen, setUserSearchOpen] = useState(false);
+  const [userSearchQuery, setUserSearchQuery] = useState("");
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const lastY = useRef(0);
@@ -35,6 +37,7 @@ export default function Navbar() {
 
   useEffect(() => {
     setSearchOpen(false);
+    setUserSearchOpen(false);
     setHidden(false);
   }, [pathname]);
 
@@ -44,6 +47,15 @@ export default function Navbar() {
       router.push(`/browse?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
       setSearchOpen(false);
+    }
+  };
+
+  const handleUserSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (userSearchQuery.trim()) {
+      router.push(`/profile/${encodeURIComponent(userSearchQuery.trim())}`);
+      setUserSearchQuery("");
+      setUserSearchOpen(false);
     }
   };
 
@@ -101,8 +113,35 @@ export default function Navbar() {
             {searchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
           </button>
 
-          {!searchOpen && (
+          {userSearchOpen && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+            >
+              <form onSubmit={handleUserSearch}>
+                <input
+                  autoFocus
+                  value={userSearchQuery}
+                  onChange={(e) => setUserSearchQuery(e.target.value)}
+                  placeholder="Search user ID..."
+                  className="w-40 rounded-lg bg-secondary px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary"
+                />
+              </form>
+            </motion.div>
+          )}
+
+          {!searchOpen && !userSearchOpen && (
             <>
+              <button
+                onClick={() => setUserSearchOpen(!userSearchOpen)}
+                className="shrink-0 p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                aria-label="Search user"
+              >
+                <User className="h-5 w-5" />
+              </button>
+
               <Link
                 href="/favorites"
                 className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-secondary transition-colors hidden sm:flex"

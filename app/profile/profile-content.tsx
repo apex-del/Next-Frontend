@@ -51,8 +51,12 @@ export default function ProfileContent() {
   const [editing, setEditing] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
+  const [isPublic, setIsPublic] = useState(true);
   const [tab, setTab] = useState<TabKey>("overview");
   const [followDialog, setFollowDialog] = useState<null | "followers" | "following">(null);
+  const [previewFile, setPreviewFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   const byStatus = useMemo(() => {
     const m: Record<string, typeof allStatus> = { watched: [], watching: [], planning: [], dropped: [] };
@@ -63,25 +67,66 @@ export default function ProfileContent() {
   const startEdit = () => {
     setDisplayName(profile?.display_name ?? "");
     setBio(profile?.bio ?? "");
+    setIsPublic(profile?.public_profile ?? true);
     setEditing(true);
   };
 
   const saveEdit = async () => {
-    await updateProfile.mutateAsync({ display_name: displayName.trim() || null, bio: bio.trim() || null });
+    await updateProfile.mutateAsync({ display_name: displayName.trim() || null, bio: bio.trim() || null, public_profile: isPublic });
     setEditing(false);
   };
 
-  const uploadAvatar = async (file: File) => {
-    if (!user) return;
-    const ext = file.name.split(".").pop() || "png";
-    const path = `${user.id}/avatar-${Date.now()}.${ext}`;
-    const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
-    if (upErr) {
-      toast({ title: "Upload failed", description: upErr.message, variant: "destructive" });
+  const handleFileSelect = (file: File) => {
+    const validTypes = ["image/png", "image/jpeg", "image/jpg"];
+    if (!validTypes.includes(file.type)) {
+      toast({ title: "Invalid file type", description: "Only PNG and JPG images are allowed. No GIFs or videos.", variant: "destructive" });
       return;
     }
-    const { data } = supabase.storage.from("avatars").getPublicUrl(path);
-    await updateProfile.mutateAsync({ avatar_url: data.publicUrl });
+
+    const maxSize = 7 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast({ title: "File too large", description: `Maximum size is 7MB. This file is ${(file.size / 1024 / 1024).toFixed(1)}MB.`, variant: "destructive" });
+      return;
+    }
+
+    setPreviewFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+    setShowPreview(true);
+  };
+
+  const cancelPreview = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewFile(null);
+    setPreviewUrl(null);
+    setShowPreview(false);
+  };
+
+  const confirmUpload = async () => {
+    if (!user || !previewFile) return;
+    const file = previewFile;
+    cancelPreview();
+
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    if (!token) {
+      toast({ title: "Upload failed", description: "Not authenticated", variant: "destructive" });
+      return;
+    }
+
+    const workerUrl = process.env.NEXT_PUBLIC_WORKER_URL || "";
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch(`${workerUrl}/api/upload/avatar`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      toast({ title: "Upload failed", description: data.error || "Server error", variant: "destructive" });
+      return;
+    }
+    await updateProfile.mutateAsync({ avatar_url: data.url });
   };
 
   if (!ownerId) {
@@ -145,9 +190,31 @@ export default function ProfileContent() {
                     </button>
                   )}
                   <input
-                    ref={fileRef} type="file" accept="image/*" className="hidden"
-                    onChange={(e) => e.target.files?.[0] && uploadAvatar(e.target.files[0])}
+                    ref={fileRef} type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg" className="hidden"
+                    onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
                   />
+
+                  {showPreview && previewUrl && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="absolute inset-0 z-50 flex flex-col items-center justify-center rounded-xl bg-black/80 backdrop-blur-sm p-4"
+                    >
+                      <img src={previewUrl} alt="Preview" className="w-32 h-32 rounded-full object-cover border-4 border-primary/40 mb-3" />
+                      <div className="flex gap-2">
+                        <button onClick={confirmUpload}
+                          className="rounded-lg bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+                        >
+                          Upload
+                        </button>
+                        <button onClick={cancelPreview}
+                          className="rounded-lg bg-secondary px-4 py-1.5 text-xs font-medium hover:bg-surface-hover"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
 
                 <div className="flex-1 min-w-0 text-center sm:text-left w-full">
@@ -167,6 +234,15 @@ export default function ProfileContent() {
                         maxLength={300}
                         className="w-full rounded-lg bg-secondary px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary resize-none"
                       />
+                      <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={isPublic}
+                          onChange={(e) => setIsPublic(e.target.checked)}
+                          className="rounded border-border bg-secondary"
+                        />
+                        Public profile
+                      </label>
                       <div className="flex gap-2 justify-center sm:justify-start">
                         <button onClick={saveEdit} disabled={updateProfile.isPending}
                           className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
