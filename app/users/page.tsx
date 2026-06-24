@@ -36,7 +36,7 @@ export default function UsersPage() {
         .order("created_at", { ascending: false })
         .limit(50);
       if (error) throw error;
-      setUsers((data || []) as PublicUser[]);
+      setUsers((data || []) as any);
     } catch {
       setUsers([]);
     } finally {
