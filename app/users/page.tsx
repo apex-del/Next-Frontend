@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Search, User, ArrowRight, Loader2 } from "lucide-react";
 import Layout from "@/components/Layout";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PublicUser {
   user_id: string;
@@ -19,7 +20,6 @@ export default function UsersPage() {
   const [users, setUsers] = useState<PublicUser[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
-  const workerUrl = process.env.NEXT_PUBLIC_WORKER_URL || "";
 
   const doSearch = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -28,9 +28,15 @@ export default function UsersPage() {
     setLoading(true);
     setHasSearched(true);
     try {
-      const res = await fetch(`${workerUrl}/api/users/search?q=${encodeURIComponent(q)}&limit=50`);
-      const data = await res.json();
-      setUsers(Array.isArray(data) ? data : []);
+      const { data, error } = await supabase
+        .from("profiles" as any)
+        .select("user_id,display_name,avatar_url,bio,created_at")
+        .eq("public_profile", true)
+        .or(`display_name.ilike.%${q}%,user_id::text.ilike.%${q}%`)
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      setUsers((data || []) as PublicUser[]);
     } catch {
       setUsers([]);
     } finally {
