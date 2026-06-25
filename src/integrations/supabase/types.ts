@@ -162,6 +162,9 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          default_server: string | null
+          default_shortener: string | null
+          default_stream_type: string | null
           display_name: string | null
           id: string
           public_profile: boolean
@@ -171,6 +174,9 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          default_server?: string | null
+          default_shortener?: string | null
+          default_stream_type?: string | null
           display_name?: string | null
           id?: string
           public_profile?: boolean
@@ -180,6 +186,9 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string
+          default_server?: string | null
+          default_shortener?: string | null
+          default_stream_type?: string | null
           display_name?: string | null
           id?: string
           public_profile?: boolean

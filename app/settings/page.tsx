@@ -7,7 +7,7 @@ import Layout from "@/components/Layout";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 import {
   AlertDialog,
@@ -20,6 +20,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function SettingsPage() {
   const { user, signOut } = useAuth();
@@ -28,6 +35,19 @@ export default function SettingsPage() {
   const { data: profile } = useProfile();
   const updateProfile = useUpdateProfile();
   const [savingPrivacy, setSavingPrivacy] = useState(false);
+  const [streamType, setStreamType] = useState("sub");
+  const [server, setServer] = useState("mixdrop");
+  const [shortener, setShortener] = useState("cuty");
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    if (profile && !isInitialized) {
+      setStreamType(profile.default_stream_type ?? "sub");
+      setServer(profile.default_server ?? "mixdrop");
+      setShortener(profile.default_shortener ?? "cuty");
+      setIsInitialized(true);
+    }
+  }, [profile, isInitialized]);
 
   if (!user) {
     return (
@@ -59,6 +79,14 @@ export default function SettingsPage() {
     } finally {
       setSavingPrivacy(false);
     }
+  };
+
+  const saveDefaultSettings = async () => {
+    await updateProfile.mutateAsync({
+      default_stream_type: streamType,
+      default_server: server,
+      default_shortener: shortener,
+    });
   };
 
   return (
@@ -103,6 +131,64 @@ export default function SettingsPage() {
                 Preferences
               </h3>
               <p className="text-sm text-muted-foreground">Notification and theme settings coming soon.</p>
+            </div>
+
+            <div className="rounded-xl bg-card border border-border p-6">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Globe className="h-4 w-4 text-primary" />
+                Defaults
+              </h3>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-xs text-muted-foreground">Default Stream Type</label>
+                  <Select value={streamType} onValueChange={setStreamType}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select stream type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sub">Sub</SelectItem>
+                      <SelectItem value="dub">Dub</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs text-muted-foreground">Default Server</label>
+                  <Select value={server} onValueChange={setServer}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select server" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="mixdrop">Mixdrop</SelectItem>
+                      <SelectItem value="filepress">Filepress</SelectItem>
+                      <SelectItem value="abyss">Abyss</SelectItem>
+                      <SelectItem value="turboviplay">Turboviplay</SelectItem>
+                      <SelectItem value="vidara">Vidara</SelectItem>
+                      <SelectItem value="streamtape">Streamtape</SelectItem>
+                      <SelectItem value="vidmoly">Vidmoly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs text-muted-foreground">Default Shortener</label>
+                  <Select value={shortener} onValueChange={setShortener}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select shortener" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cuty">Cuty</SelectItem>
+                      <SelectItem value="exe">Exe</SelectItem>
+                      <SelectItem value="gplinks">Gplinks</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <button
+                  onClick={saveDefaultSettings}
+                  disabled={updateProfile.isPending}
+                  className="w-full rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-60"
+                >
+                  {updateProfile.isPending ? "Saving…" : "Save Defaults"}
+                </button>
+              </div>
             </div>
 
             <div className="rounded-xl bg-card border border-border p-6">

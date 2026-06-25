@@ -10,6 +10,9 @@ export interface Profile {
   avatar_url: string | null;
   bio: string | null;
   public_profile: boolean;
+  default_stream_type: string | null;
+  default_server: string | null;
+  default_shortener: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -37,6 +40,9 @@ export function useProfile(userId?: string) {
         avatar_url: row.avatar_url ?? null,
         bio: row.bio ?? null,
         public_profile: row.public_profile ?? true,
+        default_stream_type: row.default_stream_type ?? null,
+        default_server: row.default_server ?? null,
+        default_shortener: row.default_shortener ?? null,
         created_at: row.created_at,
         updated_at: row.updated_at,
       } as Profile;
@@ -52,7 +58,7 @@ export function useUpdateProfile() {
 
   return useMutation({
     mutationFn: async (
-      patch: Partial<Pick<Profile, "display_name" | "avatar_url" | "bio" | "public_profile">>
+      patch: Partial<Pick<Profile, "display_name" | "avatar_url" | "bio" | "public_profile" | "default_stream_type" | "default_server" | "default_shortener">>
     ) => {
       if (!user) throw new Error("Must be signed in");
       const { error } = await supabase
