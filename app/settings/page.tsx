@@ -36,14 +36,14 @@ export default function SettingsPage() {
   const updateProfile = useUpdateProfile();
   const [savingPrivacy, setSavingPrivacy] = useState(false);
   const [streamType, setStreamType] = useState("sub");
-  const [server, setServer] = useState("mixdrop");
+  const [server, setServer] = useState("abyss");
   const [shortener, setShortener] = useState("cuty");
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     if (profile && !isInitialized) {
       setStreamType(profile.default_stream_type ?? "sub");
-      setServer(profile.default_server ?? "mixdrop");
+      setServer(profile.default_server ?? "abyss");
       setShortener(profile.default_shortener ?? "cuty");
       setIsInitialized(true);
     }
@@ -158,13 +158,9 @@ export default function SettingsPage() {
                       <SelectValue placeholder="Select server" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="mixdrop">Mixdrop</SelectItem>
-                      <SelectItem value="filepress">Filepress</SelectItem>
                       <SelectItem value="abyss">Abyss</SelectItem>
                       <SelectItem value="turboviplay">Turboviplay</SelectItem>
                       <SelectItem value="vidara">Vidara</SelectItem>
-                      <SelectItem value="streamtape">Streamtape</SelectItem>
-                      <SelectItem value="vidmoly">Vidmoly</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

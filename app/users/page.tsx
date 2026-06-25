@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Search, User, ArrowRight, Loader2 } from "lucide-react";
 import Layout from "@/components/Layout";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PublicUser {
   user_id: string;
@@ -27,10 +28,25 @@ export default function UsersPage() {
     setLoading(true);
     setHasSearched(true);
     try {
-      const workerUrl = process.env.NEXT_PUBLIC_WORKER_URL || "";
-      const res = await fetch(`${workerUrl}/api/users/search?q=${encodeURIComponent(q)}&limit=50`);
-      const data = await res.json();
-      setUsers(Array.isArray(data) ? data : []);
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const isExactUuid = uuidRegex.test(q);
+
+      let query = supabase
+        .from("profiles" as any)
+        .select("user_id,display_name,avatar_url,bio,created_at")
+        .eq("public_profile", true)
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (isExactUuid) {
+        query = query.eq("user_id", q);
+      } else {
+        query = query.ilike("display_name", `%${q}%`);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      setUsers((data || []) as any);
     } catch {
       setUsers([]);
     } finally {
