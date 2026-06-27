@@ -3,7 +3,7 @@ import {
   type JikanEpisode,
   type JikanAnime,
 } from "./jikan";
-import { fetchExtEpisodes } from "./externalDb";
+import { fetchExtEpisodes, fetchStreams } from "./externalDb";
 import { getAniListMedia } from "./anilist";
 
 const OKKUP_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://okkupxjkocgasztfldak.supabase.co";
@@ -31,12 +31,14 @@ export async function getEpisodesTrio(id: number, page = 1): Promise<EpisodesRes
         filler: e.filler,
         recap: e.recap,
         forum_url: null,
+        thumbnail: e.thumbnail,
       }));
       const start = (page - 1) * PAGE;
       const slice = mapped.slice(start, start + PAGE);
       const last = Math.max(1, Math.ceil(mapped.length / PAGE));
+      const enriched = await enrichSubDub(id, slice);
       return {
-        data: slice,
+        data: enriched,
         pagination: { last_visible_page: last, has_next_page: page < last, current_page: page },
         source: "external",
       };
@@ -58,6 +60,7 @@ export async function getEpisodesTrio(id: number, page = 1): Promise<EpisodesRes
           filler: false,
           recap: false,
           forum_url: null,
+          thumbnail: e.thumbnail,
         }));
       } else if (media.episodes) {
         mapped = Array.from({ length: media.episodes }, (_, i) => ({
@@ -70,14 +73,16 @@ export async function getEpisodesTrio(id: number, page = 1): Promise<EpisodesRes
           filler: false,
           recap: false,
           forum_url: null,
+          thumbnail: null,
         }));
       }
       if (mapped.length) {
         const start = (page - 1) * PAGE;
         const slice = mapped.slice(start, start + PAGE);
         const last = Math.max(1, Math.ceil(mapped.length / PAGE));
+        const enriched = await enrichSubDub(id, slice);
         return {
-          data: slice,
+          data: enriched,
           pagination: { last_visible_page: last, has_next_page: page < last, current_page: page },
           source: "anilist",
         };
@@ -86,6 +91,28 @@ export async function getEpisodesTrio(id: number, page = 1): Promise<EpisodesRes
   } catch {}
 
   return { data: [], source: "none" };
+}
+
+async function enrichSubDub(id: number, episodes: JikanEpisode[]): Promise<JikanEpisode[]> {
+  try {
+    const streams = await fetchStreams(id);
+    const byEp = new Map<number, { sub: boolean; dub: boolean }>();
+    for (const s of streams) {
+      if (!byEp.has(s.episode_number)) byEp.set(s.episode_number, { sub: false, dub: false });
+      const entry = byEp.get(s.episode_number)!;
+      if (s.category === "dub") entry.dub = true;
+      else entry.sub = true;
+    }
+    return episodes.map((ep) => {
+      const info = byEp.get(ep.mal_id);
+      if (info) {
+        return { ...ep, hasSub: info.sub, hasDub: info.dub };
+      }
+      return ep;
+    });
+  } catch {
+    return episodes;
+  }
 }
 
 export interface RecEntry {

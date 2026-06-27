@@ -36,14 +36,14 @@ export default function SettingsPage() {
   const updateProfile = useUpdateProfile();
   const [savingPrivacy, setSavingPrivacy] = useState(false);
   const [streamType, setStreamType] = useState("sub");
-  const [server, setServer] = useState("abyss");
+  const [server, setServer] = useState("turboviplay");
   const [shortener, setShortener] = useState("cuty");
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     if (profile && !isInitialized) {
       setStreamType(profile.default_stream_type ?? "sub");
-      setServer(profile.default_server ?? "abyss");
+      setServer(profile.default_server ?? "turboviplay");
       setShortener(profile.default_shortener ?? "cuty");
       setIsInitialized(true);
     }

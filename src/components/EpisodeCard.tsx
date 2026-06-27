@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Calendar } from "lucide-react";
+import { Download, Calendar, ImageIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { JikanEpisode } from "@/lib/jikan";
 import ReportButton from "./ReportButton";
@@ -24,9 +24,27 @@ export default function EpisodeCard({
 
   return (
     <div className="flex items-center gap-4 rounded-lg bg-card border border-border p-4 transition-all hover:bg-surface-hover hover:border-primary/20 group">
+      {/* Thumbnail */}
+      <div className="relative h-[68px] w-[120px] shrink-0 overflow-hidden rounded-lg bg-secondary">
+        {episode.thumbnail ? (
+          <img
+            src={episode.thumbnail}
+            alt={`Episode ${episode.mal_id}`}
+            className="h-full w-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <ImageIcon className="h-6 w-6 text-muted-foreground/50" />
+          </div>
+        )}
+      </div>
+
       {/* Episode Number */}
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-secondary text-primary font-bold text-lg">
-        {episode.mal_id}
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-secondary text-xs text-muted-foreground font-semibold leading-tight">
+        <span className="text-center">
+          EP<br/>{episode.mal_id}
+        </span>
       </div>
 
       {/* Info */}
@@ -34,11 +52,21 @@ export default function EpisodeCard({
         <h4 className="text-sm font-semibold line-clamp-1 group-hover:text-primary transition-colors">
           {episode.title || `Episode ${episode.mal_id}`}
         </h4>
-        <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
+        <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
           {episode.aired && (
             <span className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
               {new Date(episode.aired).toLocaleDateString()}
+            </span>
+          )}
+          {episode.hasSub && (
+            <span className="rounded bg-blue-500/15 text-blue-400 px-1.5 py-0.5 text-[10px] font-semibold">
+              SUB
+            </span>
+          )}
+          {episode.hasDub && (
+            <span className="rounded bg-green-500/15 text-green-400 px-1.5 py-0.5 text-[10px] font-semibold">
+              DUB
             </span>
           )}
           {episode.filler && (

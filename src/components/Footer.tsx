@@ -1,7 +1,13 @@
 import Link from "next/link";
-import { Download, Github, Twitter, Heart } from "lucide-react";
+import { Download, Github, Twitter, Heart, Coffee, type LucideIcon } from "lucide-react";
 
-const footerLinks = {
+interface FooterLink {
+  label: string;
+  href: string;
+  icon?: LucideIcon;
+}
+
+const footerLinks: Record<string, FooterLink[]> = {
   Browse: [
     { label: "Trending", href: "/browse?sort=popularity" },
     { label: "Top Rated", href: "/browse?sort=score" },
@@ -13,6 +19,7 @@ const footerLinks = {
     { label: "Favorites", href: "/favorites" },
     { label: "Watch History", href: "/history" },
     { label: "Settings", href: "/settings" },
+    { label: "Support Us", href: "/support", icon: Coffee },
   ],
   Genres: [
     { label: "Action", href: "/browse?genre=1" },
@@ -63,16 +70,20 @@ export default function Footer() {
             <div key={title}>
               <h4 className="font-semibold text-sm mb-3">{title}</h4>
               <ul className="space-y-2">
-                {links.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
+                {links.map((link) => {
+                  const Icon = link.icon;
+                  return (
+                    <li key={link.label}>
+                      <Link
+                        href={link.href}
+                        className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1.5"
+                      >
+                        {Icon && <Icon className="h-3.5 w-3.5" />}
+                        {link.label}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}

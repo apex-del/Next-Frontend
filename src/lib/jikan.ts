@@ -141,6 +141,9 @@ export interface JikanEpisode {
   filler: boolean;
   recap: boolean;
   forum_url: string | null;
+  thumbnail?: string | null;
+  hasSub?: boolean;
+  hasDub?: boolean;
 }
 
 interface JikanResponse<T> {
