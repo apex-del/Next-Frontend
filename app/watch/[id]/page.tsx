@@ -242,7 +242,7 @@ function WatchContent() {
             <span className="text-xs sm:text-sm font-semibold text-muted-foreground shrink-0">
               Audio
             </span>
-            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
               {(["sub", "dub"] as const).map((a) => {
                 const available = availableAudio.length === 0 || availableAudio.includes(a);
                 return (
@@ -250,7 +250,7 @@ function WatchContent() {
                     key={a}
                     onClick={() => setAudio(a)}
                     disabled={!available && availableAudio.length > 0}
-                    className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium uppercase transition-all inline-flex items-center gap-1.5 ${
+                    className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium uppercase transition-all inline-flex items-center justify-center gap-1.5 ${
                       audio === a
                         ? "bg-primary text-primary-foreground"
                         : "bg-secondary text-muted-foreground hover:text-foreground"

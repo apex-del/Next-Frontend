@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Calendar, ImageIcon } from "lucide-react";
+import { Download, Calendar } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { JikanEpisode } from "@/lib/jikan";
 import ReportButton from "./ReportButton";
@@ -23,9 +23,9 @@ export default function EpisodeCard({
   };
 
   return (
-    <div className="flex items-center gap-4 rounded-lg bg-card border border-border p-4 transition-all hover:bg-surface-hover hover:border-primary/20 group">
+    <div className="flex items-center gap-2.5 sm:gap-3 rounded-lg bg-card border border-border px-2 sm:px-3 py-2.5 sm:py-3 transition-all hover:bg-surface-hover hover:border-primary/20 group">
       {/* Thumbnail with episode number badge */}
-      <div className="relative h-[68px] w-[120px] shrink-0 overflow-hidden rounded-lg bg-secondary">
+      <div className="relative h-[60px] w-[106px] sm:h-[68px] sm:w-[120px] shrink-0 overflow-hidden rounded-lg bg-secondary">
         {episode.thumbnail ? (
           <>
             <img
@@ -39,8 +39,8 @@ export default function EpisodeCard({
             </span>
           </>
         ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <ImageIcon className="h-6 w-6 text-muted-foreground/50" />
+          <div className="flex h-full w-full items-center justify-center bg-secondary font-bold text-xs text-muted-foreground">
+            {episode.mal_id}
           </div>
         )}
       </div>
