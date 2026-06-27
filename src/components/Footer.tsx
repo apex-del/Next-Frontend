@@ -50,7 +50,7 @@ export default function Footer() {
             </p>
             <Link
               href="/support"
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-lg shadow-primary/25 animate-pulse-soft hover:animate-none"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-lg shadow-primary/25"
             >
               <Coffee className="h-4 w-4" />
               Support Us

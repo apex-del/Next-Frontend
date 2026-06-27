@@ -25,25 +25,23 @@ export default function EpisodeCard({
   return (
     <div className="flex items-center gap-2.5 sm:gap-3 rounded-lg bg-card border border-border px-2.5 sm:px-4 py-2.5 sm:py-3 transition-all hover:bg-surface-hover hover:border-primary/20 group">
       {/* Thumbnail with episode number badge */}
-      <div className="relative h-[60px] w-[106px] sm:h-[68px] sm:w-[120px] shrink-0 overflow-hidden rounded-lg bg-secondary">
-        {episode.thumbnail ? (
-          <>
-            <img
-              src={episode.thumbnail}
-              alt={`Episode ${episode.mal_id}`}
-              className="h-full w-full object-cover"
-              loading="lazy"
-            />
-            <span className="absolute top-1 left-1 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-bold text-white leading-tight">
-              EP {episode.mal_id}
-            </span>
-          </>
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-secondary font-bold text-xs text-muted-foreground">
-            {episode.mal_id}
-          </div>
-        )}
-      </div>
+      {episode.thumbnail ? (
+        <div className="relative h-[60px] w-[106px] sm:h-[68px] sm:w-[120px] shrink-0 overflow-hidden rounded-lg bg-secondary">
+          <img
+            src={episode.thumbnail}
+            alt={`Episode ${episode.mal_id}`}
+            className="h-full w-full object-cover"
+            loading="lazy"
+          />
+          <span className="absolute top-1 left-1 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-bold text-white leading-tight">
+            EP {episode.mal_id}
+          </span>
+        </div>
+      ) : (
+        <div className="shrink-0 flex items-center justify-center bg-secondary font-bold text-xs text-muted-foreground px-2.5 py-1.5 rounded-md">
+          {episode.mal_id}
+        </div>
+      )}
 
       {/* Info */}
       <div className="flex-1 min-w-0">

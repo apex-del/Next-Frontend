@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Script from "next/script";
 import { motion } from "framer-motion";
-import { Heart, Coffee, ExternalLink } from "lucide-react";
+import { Heart, Coffee } from "lucide-react";
 import Layout from "@/components/Layout";
 
 export default function SupportPage() {
@@ -31,13 +30,15 @@ export default function SupportPage() {
                 Your support helps cover server costs and keeps the site running
                 smoothly for everyone.
               </p>
-              <iframe
-                src="https://ko-fi.com/L5O820YNA7/?hidefeed=true&widget=true&embed=true"
-                style={{ border: 0, width: '100%', maxWidth: '400px', height: '600px' }}
-                className="mx-auto"
-                title="Support Us on Ko-fi"
-                loading="lazy"
-              />
+              <a href="https://ko-fi.com/L5O820YNA7" target="_blank" rel="noopener noreferrer">
+                <img
+                  height="36"
+                  style={{ border: 0, height: 36 }}
+                  src="https://storage.ko-fi.com/cdn/kofi3.png?v=6"
+                  alt="Buy Me a Coffee at ko-fi.com"
+                  className="mx-auto"
+                />
+              </a>
             </div>
 
             <div className="rounded-xl bg-card border border-border p-6">
@@ -93,8 +94,6 @@ export default function SupportPage() {
                 </li>
               </ul>
             </div>
-
-            <Script src="https://storage.ko-fi.com/cdn/widget/Widget_2.js" strategy="lazyOnload" />
 
             <div className="text-center pt-4">
               <Link
