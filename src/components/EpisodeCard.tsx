@@ -23,7 +23,7 @@ export default function EpisodeCard({
   };
 
   return (
-    <div className="flex items-center gap-2.5 sm:gap-3 rounded-lg bg-card border border-border px-2 sm:px-3 py-2.5 sm:py-3 transition-all hover:bg-surface-hover hover:border-primary/20 group">
+    <div className="flex items-center gap-2.5 sm:gap-3 rounded-lg bg-card border border-border px-2.5 sm:px-4 py-2.5 sm:py-3 transition-all hover:bg-surface-hover hover:border-primary/20 group">
       {/* Thumbnail with episode number badge */}
       <div className="relative h-[60px] w-[106px] sm:h-[68px] sm:w-[120px] shrink-0 overflow-hidden rounded-lg bg-secondary">
         {episode.thumbnail ? (

@@ -249,7 +249,7 @@ export default function AnimeDetailsClient({ animeId }: AnimeDetailsClientProps)
             </div>
 
             <div className="flex flex-wrap gap-2 mb-5">
-              {anime.genres.map((g: { mal_id: number; name: string }) => (
+              {anime.genres?.map((g: { mal_id: number; name: string }) => (
                 <Link
                   key={g.mal_id}
                   href={`/browse?genre=${g.mal_id}`}

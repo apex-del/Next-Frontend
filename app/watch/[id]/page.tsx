@@ -242,7 +242,7 @@ function WatchContent() {
             <span className="text-xs sm:text-sm font-semibold text-muted-foreground shrink-0">
               Audio
             </span>
-            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
+            <div className="flex flex-wrap gap-2 items-center">
               {(["sub", "dub"] as const).map((a) => {
                 const available = availableAudio.length === 0 || availableAudio.includes(a);
                 return (
@@ -378,16 +378,30 @@ function WatchContent() {
                   <button
                     key={n}
                     onClick={() => updateEp(n)}
-                    className={`w-full flex items-center gap-3 rounded-lg p-2.5 sm:p-3 text-left transition-all border ${
+                    className={`w-full flex items-center gap-2.5 sm:gap-3 rounded-lg px-2.5 sm:px-4 py-2.5 sm:py-3 text-left transition-all border ${
                       active
                         ? "bg-primary/15 border-primary/40"
                         : "bg-card border-border hover:bg-surface-hover"
                     }`}
                   >
-                    <div className={`shrink-0 h-9 w-9 sm:h-10 sm:w-10 rounded-lg flex items-center justify-center font-bold text-xs sm:text-sm ${
-                      active ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"
-                    }`}>
-                      {n}
+                    <div className="relative h-[60px] w-[106px] sm:h-[68px] sm:w-[120px] shrink-0 overflow-hidden rounded-lg bg-secondary">
+                      {epInfo?.thumbnail ? (
+                        <>
+                          <img
+                            src={epInfo.thumbnail}
+                            alt={`Episode ${n}`}
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                          />
+                          <span className="absolute top-1 left-1 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-bold text-white leading-tight">
+                            EP {n}
+                          </span>
+                        </>
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-secondary font-bold text-xs sm:text-sm text-muted-foreground">
+                          {n}
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-xs sm:text-sm truncate">
@@ -413,6 +427,7 @@ function WatchContent() {
               src={anime.images.webp.large_image_url}
               alt={getDisplayTitle(anime)}
               className="w-16 sm:w-20 md:w-28 rounded-lg shrink-0 object-cover"
+              loading="lazy"
             />
             <div className="flex-1 min-w-0">
               <h3 className="font-bold text-sm sm:text-base md:text-lg line-clamp-2">{getDisplayTitle(anime)}</h3>
