@@ -24,27 +24,25 @@ export default function EpisodeCard({
 
   return (
     <div className="flex items-center gap-4 rounded-lg bg-card border border-border p-4 transition-all hover:bg-surface-hover hover:border-primary/20 group">
-      {/* Thumbnail */}
+      {/* Thumbnail with episode number badge */}
       <div className="relative h-[68px] w-[120px] shrink-0 overflow-hidden rounded-lg bg-secondary">
         {episode.thumbnail ? (
-          <img
-            src={episode.thumbnail}
-            alt={`Episode ${episode.mal_id}`}
-            className="h-full w-full object-cover"
-            loading="lazy"
-          />
+          <>
+            <img
+              src={episode.thumbnail}
+              alt={`Episode ${episode.mal_id}`}
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+            <span className="absolute top-1 left-1 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-bold text-white leading-tight">
+              EP {episode.mal_id}
+            </span>
+          </>
         ) : (
           <div className="flex h-full w-full items-center justify-center">
             <ImageIcon className="h-6 w-6 text-muted-foreground/50" />
           </div>
         )}
-      </div>
-
-      {/* Episode Number */}
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-secondary text-xs text-muted-foreground font-semibold leading-tight">
-        <span className="text-center">
-          EP<br/>{episode.mal_id}
-        </span>
       </div>
 
       {/* Info */}
@@ -57,16 +55,6 @@ export default function EpisodeCard({
             <span className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
               {new Date(episode.aired).toLocaleDateString()}
-            </span>
-          )}
-          {episode.hasSub && (
-            <span className="rounded bg-blue-500/15 text-blue-400 px-1.5 py-0.5 text-[10px] font-semibold">
-              SUB
-            </span>
-          )}
-          {episode.hasDub && (
-            <span className="rounded bg-green-500/15 text-green-400 px-1.5 py-0.5 text-[10px] font-semibold">
-              DUB
             </span>
           )}
           {episode.filler && (

@@ -8,7 +8,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, Info, Server, Play, ChevronLeft, ChevronRight,
-  Star, Calendar, Film, List, Download, AlertCircle,
+  Star, Calendar, Film, List, Download, AlertCircle, Languages, Mic,
 } from "lucide-react";
 import Layout from "@/components/Layout";
 import AnimeCard from "@/components/AnimeCard";
@@ -250,12 +250,13 @@ function WatchContent() {
                     key={a}
                     onClick={() => setAudio(a)}
                     disabled={!available && availableAudio.length > 0}
-                    className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium uppercase transition-all ${
+                    className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium uppercase transition-all inline-flex items-center gap-1.5 ${
                       audio === a
                         ? "bg-primary text-primary-foreground"
                         : "bg-secondary text-muted-foreground hover:text-foreground"
                     } disabled:opacity-40`}
                   >
+                    {a === "sub" ? <Languages className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
                     {a}
                   </button>
                 );

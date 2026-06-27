@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Download, Github, Twitter, Heart, Coffee, type LucideIcon } from "lucide-react";
+import { Download, Heart, Coffee, type LucideIcon } from "lucide-react";
 
 interface FooterLink {
   label: string;
@@ -49,20 +49,13 @@ export default function Footer() {
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">
               Your ultimate destination for discovering and downloading anime. Powered by MyAnimeList data.
             </p>
-            <div className="flex items-center gap-3">
-              <a
-                href="#"
-                className="p-2 rounded-lg bg-secondary text-muted-foreground hover:text-foreground hover:bg-surface-hover transition-colors"
-              >
-                <Twitter className="h-4 w-4" />
-              </a>
-              <a
-                href="#"
-                className="p-2 rounded-lg bg-secondary text-muted-foreground hover:text-foreground hover:bg-surface-hover transition-colors"
-              >
-                <Github className="h-4 w-4" />
-              </a>
-            </div>
+            <Link
+              href="/support"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-lg shadow-primary/25"
+            >
+              <Coffee className="h-4 w-4" />
+              Support Us
+            </Link>
           </div>
 
           {/* Link groups */}

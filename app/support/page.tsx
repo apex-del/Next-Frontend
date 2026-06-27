@@ -50,19 +50,23 @@ export default function SupportPage() {
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-0.5">•</span>
-                  Keep the site ad-free and accessible to everyone
+                  Keep the site completely ad-free and accessible to everyone
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-0.5">•</span>
-                  Cover server and API costs
+                  Cover server hosting, bandwidth, and API subscription costs
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-0.5">•</span>
-                  Fund new features and improvements
+                  Fund new features, faster streams, and quality-of-life improvements
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-0.5">•</span>
-                  Support independent anime fan projects
+                  Support an independent anime fan project built with passion
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5">•</span>
+                  Help us add more servers, better quality, and more languages
                 </li>
               </ul>
             </div>
@@ -72,10 +76,24 @@ export default function SupportPage() {
                 <Heart className="h-4 w-4 text-primary" />
                 Other Ways to Help
               </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Can&apos;t donate? No problem! You can still help by sharing the site with friends,
-                reporting bugs, or contributing on GitHub. Every bit of support counts!
-              </p>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5">★</span>
+                  Share ApexAnime with friends who love anime
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5">★</span>
+                  Report bugs or issues you come across
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5">★</span>
+                  Suggest new features and improvements
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5">★</span>
+                  Spread the word on social media
+                </li>
+              </ul>
             </div>
 
             <div className="text-center pt-4">
