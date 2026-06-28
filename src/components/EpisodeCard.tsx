@@ -38,7 +38,7 @@ export default function EpisodeCard({
           </span>
         </div>
       ) : (
-        <div className="shrink-0 flex items-center justify-center bg-secondary font-bold text-xs text-muted-foreground px-2.5 py-1.5 rounded-md">
+        <div className="shrink-0 w-[32px] sm:w-[36px] h-[32px] sm:h-[36px] flex items-center justify-center rounded-lg bg-secondary font-bold text-xs sm:text-sm text-muted-foreground">
           {episode.mal_id}
         </div>
       )}

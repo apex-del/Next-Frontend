@@ -30,13 +30,16 @@ export default function SupportPage() {
                 Your support helps cover server costs and keeps the site running
                 smoothly for everyone.
               </p>
-              <a href="https://ko-fi.com/L5O820YNA7" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://ko-fi.com/L5O820YNA7"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block rounded-xl border border-border bg-secondary hover:bg-surface-hover transition-colors p-3"
+              >
                 <img
-                  height="36"
-                  style={{ border: 0, height: 36 }}
-                  src="https://storage.ko-fi.com/cdn/kofi3.png?v=6"
+                  src="https://storage.ko-fi.com/cdn/kofi4.png?v=6"
                   alt="Buy Me a Coffee at ko-fi.com"
-                  className="mx-auto"
+                  style={{ height: 42 }}
                 />
               </a>
             </div>
