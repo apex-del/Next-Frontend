@@ -157,6 +157,7 @@ export async function fetchAnikotoEmbeds(
   episode: number,
   anikotoId?: string
 ): Promise<AnikotoStream[]> {
+  // Step 1: Try Worker proxy first (with caching)
   try {
     const params = new URLSearchParams({
       mal_id: String(malId),
@@ -164,7 +165,6 @@ export async function fetchAnikotoEmbeds(
     });
     if (anikotoId) params.set("anikoto_id", anikotoId);
 
-    // Try Worker proxy first (with caching)
     if (WORKER_URL) {
       const res = await fetch(`${WORKER_URL}/api/ext/anikoto/embeds?${params}`);
       if (res.ok) {
@@ -187,6 +187,87 @@ export async function fetchAnikotoEmbeds(
         return streams;
       }
     }
+  } catch {}
+
+  // Step 2: Direct fallback — lookup show_id from FZR, then use anikototv.to
+  try {
+    // Lookup show_id from FZR DB (public read)
+    const mapRes = await fetch(
+      `${FZR_URL}/rest/v1/anime_anikoto_map?mal_id=eq.${malId}&select=show_id`,
+      { headers: { apikey: FZR_KEY, Authorization: `Bearer ${FZR_KEY}` } }
+    );
+    if (!mapRes.ok) return [];
+    const rows = await mapRes.json() as { show_id: string }[];
+    if (!rows.length || !rows[0].show_id) return [];
+    const showId = rows[0].show_id;
+
+    // Get episode data-ids
+    const epRes = await fetch(`https://anikototv.to/ajax/episode/list/${showId}`, {
+      headers: { "User-Agent": "ApexAnime/1.0", "X-Requested-With": "XMLHttpRequest" },
+    });
+    if (!epRes.ok) return [];
+    const epData = await epRes.json();
+    const epHtml = epData?.result || "";
+    const epMatch = epHtml.match(
+      new RegExp(`data-num="${episode}"[^>]*data-ids="([^"]+)"`, "i")
+    );
+    if (!epMatch) return [];
+    const dataIds = epMatch[1];
+
+    // Get servers
+    const srvRes = await fetch(
+      `https://anikototv.to/ajax/server/list?servers=${dataIds}`,
+      { headers: { "User-Agent": "ApexAnime/1.0", "X-Requested-With": "XMLHttpRequest" } }
+    );
+    if (!srvRes.ok) return [];
+    const srvData = await srvRes.json();
+    const srvHtml = srvData?.result || "";
+
+    // Parse servers with language
+    const servers: { link_id: string; name: string; language: string }[] = [];
+    let curLang = "sub";
+    for (const line of srvHtml.split("\n")) {
+      const langMatch = line.match(/data-type="(sub|dub)"/i);
+      if (langMatch) curLang = langMatch[1];
+      const liMatches = line.matchAll(/data-link-id="([^"]+)"[^>]*>([^<]+)/g);
+      for (const m of liMatches) {
+        servers.push({ link_id: m[1], name: m[2].trim(), language: curLang });
+      }
+    }
+    if (!servers.length) return [];
+
+    // Resolve embed URLs (first 4 servers only to avoid CORS issues)
+    const streams: AnikotoStream[] = [];
+    for (const srv of servers.slice(0, 4)) {
+      try {
+        const resolveRes = await fetch(
+          `https://anikototv.to/ajax/server?get=${srv.link_id}`,
+          { headers: { "User-Agent": "ApexAnime/1.0", "X-Requested-With": "XMLHttpRequest" } }
+        );
+        if (!resolveRes.ok) continue;
+        const resolveData = await resolveRes.json();
+        const embedUrl = resolveData?.result?.url;
+        if (!embedUrl) continue;
+
+        let serverType = "unknown";
+        if (/vidtube\.site/i.test(embedUrl)) serverType = "vidplay";
+        else if (/megaplay\.buzz/i.test(embedUrl)) serverType = "hd";
+        else if (/vidwish\.live/i.test(embedUrl)) serverType = "vidcloud";
+
+        streams.push({
+          id: `anikoto-${srv.link_id}`,
+          mal_id: malId,
+          episode_number: episode,
+          quality: "1080p",
+          category: srv.language as "sub" | "dub",
+          service_name: `anikoto-${serverType}`,
+          service_url: embedUrl,
+          embed_url: embedUrl,
+          status: "active",
+        });
+      } catch {}
+    }
+    return streams;
   } catch {}
   return [];
 }
