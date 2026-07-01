@@ -180,7 +180,7 @@ function WatchContent() {
               className="w-full h-full block"
               allowFullScreen
               allow="autoplay; encrypted-media; picture-in-picture"
-              referrerPolicy="no-referrer"
+              referrerPolicy="strict-origin-when-cross-origin"
               title={`Watch ${getDisplayTitle(anime)} Ep ${currentEp}`}
             />
           </div>

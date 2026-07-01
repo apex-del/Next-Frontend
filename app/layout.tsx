@@ -65,6 +65,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <meta name="monetag" content="e98f681be19545d98687f88348b1183a" />
         <link rel="icon" href="/jolly-roger.png" type="image/png" />
         {/* Google Analytics */}
         <script
