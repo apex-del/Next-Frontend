@@ -28,9 +28,6 @@ import { useEpisodeStreams } from "@/hooks/useStreams";
 
 type AudioType = "sub" | "dub";
 
-const DEMO_VIDEO =
-  "https://www.youtube.com/embed/videoseries?list=PLLY8MJl5GiHzC2sB-tEdaaavQ85_y1bL6";
-
 const EPISODES_PER_PAGE = 50;
 
 function slugify(title: string) {
@@ -53,6 +50,10 @@ const SERVICE_LABELS: Record<string, string> = {
   abyss: "Abyss",
   turboviplay: "TurboVid",
   anonfiles: "AnonFiles",
+  "anikoto-vidplay": "VidPlay",
+  "anikoto-hd": "HD Server",
+  "anikoto-vidcloud": "VidCloud",
+  "anikoto-unknown": "Server",
 };
 const label = (s: string) =>
   SERVICE_LABELS[s] ||
@@ -104,13 +105,7 @@ function WatchContent() {
   }, [filteredStreams, activeServerId]);
 
   const activeStream = filteredStreams.find((s) => s.id === activeServerId);
-  const fallbackEmbed = useMemo(() => {
-    if (!slug) return DEMO_VIDEO;
-    return `https://www.youtube.com/embed/?listType=search&list=${encodeURIComponent(
-      `${slug.replace(/-/g, " ")} episode ${currentEp} ${audio === "dub" ? "english dub" : "english sub"}`,
-    )}`;
-  }, [slug, currentEp, audio]);
-  const embedUrl = activeStream?.embed_url || activeStream?.service_url || fallbackEmbed;
+  const embedUrl = activeStream?.embed_url || activeStream?.service_url || "";
 
   const [iframeLoading, setIframeLoading] = useState(true);
   useEffect(() => {
@@ -288,7 +283,7 @@ function WatchContent() {
               ) : (
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <AlertCircle className="h-3.5 w-3.5" />
-                  No {audio.toUpperCase()} servers yet — showing fallback search.
+                  No {audio.toUpperCase()} servers available yet.
                 </div>
               )}
             </div>
@@ -296,7 +291,7 @@ function WatchContent() {
           {activeStream && (
             <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-secondary/40 px-3 py-2">
               <p className="text-[11px] sm:text-xs text-muted-foreground">
-                If one player fails, switch server to Vidara, then TurboVid, then Abyss.
+                If one player fails, try other servers. Anikoto servers are available when our own servers aren't ready.
               </p>
               <div className="flex items-center gap-1.5">
                 <ReportButton animeId={animeId} animeTitle={getDisplayTitle(anime)} episodeNumber={currentEp} />

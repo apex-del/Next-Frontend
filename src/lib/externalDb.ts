@@ -54,7 +54,7 @@ export interface ExtEpisode {
 }
 
 const EMBED_HOSTS = new Set(["vidara", "turbovid", "turboviplay", "abyss"]);
-const STREAM_PRIORITY: Record<string, number> = { vidara: 0, turbovid: 1, abyss: 2 };
+const STREAM_PRIORITY: Record<string, number> = { vidara: 0, turbovid: 1, abyss: 2, "anikoto-vidplay": 10, "anikoto-hd": 11, "anikoto-vidcloud": 12, "anikoto-unknown": 13 };
 
 function normalizeServiceName(service: string) {
   const s = service.toLowerCase().trim();
@@ -138,6 +138,72 @@ export async function fetchShortLinks(malId: number, episode?: number): Promise<
   const p = new URLSearchParams({ select: "*", mal_id: `eq.${malId}`, status: "eq.completed", order: "service_name.asc" });
   if (episode != null) p.set("episode_number", `eq.${episode}`);
   return apiFetch("shortened_urls", p);
+}
+
+export interface AnikotoStream {
+  id: string;
+  mal_id: number;
+  episode_number: number;
+  quality: string;
+  category: "sub" | "dub";
+  service_name: string;
+  service_url: string;
+  embed_url: string;
+  status: "active";
+}
+
+export async function fetchAnikotoEmbeds(
+  malId: number,
+  episode: number,
+  anikotoId?: string
+): Promise<AnikotoStream[]> {
+  try {
+    const params = new URLSearchParams({
+      mal_id: String(malId),
+      episode: String(episode),
+    });
+    if (anikotoId) params.set("anikoto_id", anikotoId);
+
+    // Try Worker proxy first (with caching)
+    if (WORKER_URL) {
+      const res = await fetch(`${WORKER_URL}/api/ext/anikoto/embeds?${params}`);
+      if (res.ok) {
+        const data = await res.json();
+        const servers = data?.servers || [];
+        const streams: AnikotoStream[] = [];
+        for (const srv of servers) {
+          const lang = srv.sub_url ? "sub" : "dub";
+          streams.push({
+            id: `anikoto-${srv.server_id}`,
+            mal_id: malId,
+            episode_number: episode,
+            quality: "1080p",
+            category: lang,
+            service_name: `anikoto-${srv.server_type}`,
+            service_url: lang === "sub" ? srv.sub_url : srv.dub_url,
+            embed_url: lang === "sub" ? srv.sub_url : srv.dub_url,
+            status: "active",
+          });
+          // Also add both sub and dub variants
+          if (srv.sub_url && srv.dub_url) {
+            streams.push({
+              id: `anikoto-${srv.server_id}-dub`,
+              mal_id: malId,
+              episode_number: episode,
+              quality: "1080p",
+              category: "dub",
+              service_name: `anikoto-${srv.server_type}`,
+              service_url: srv.dub_url,
+              embed_url: srv.dub_url,
+              status: "active",
+            });
+          }
+        }
+        return streams;
+      }
+    }
+  } catch {}
+  return [];
 }
 
 export async function fetchExtEpisodes(malId: number): Promise<ExtEpisode[]> {
