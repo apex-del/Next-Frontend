@@ -172,32 +172,17 @@ export async function fetchAnikotoEmbeds(
         const servers = data?.servers || [];
         const streams: AnikotoStream[] = [];
         for (const srv of servers) {
-          const lang = srv.sub_url ? "sub" : "dub";
           streams.push({
-            id: `anikoto-${srv.server_id}`,
+            id: `anikoto-${srv.link_id}`,
             mal_id: malId,
             episode_number: episode,
             quality: "1080p",
-            category: lang,
+            category: srv.language as "sub" | "dub",
             service_name: `anikoto-${srv.server_type}`,
-            service_url: lang === "sub" ? srv.sub_url : srv.dub_url,
-            embed_url: lang === "sub" ? srv.sub_url : srv.dub_url,
+            service_url: srv.embed_url,
+            embed_url: srv.embed_url,
             status: "active",
           });
-          // Also add both sub and dub variants
-          if (srv.sub_url && srv.dub_url) {
-            streams.push({
-              id: `anikoto-${srv.server_id}-dub`,
-              mal_id: malId,
-              episode_number: episode,
-              quality: "1080p",
-              category: "dub",
-              service_name: `anikoto-${srv.server_type}`,
-              service_url: srv.dub_url,
-              embed_url: srv.dub_url,
-              status: "active",
-            });
-          }
         }
         return streams;
       }
