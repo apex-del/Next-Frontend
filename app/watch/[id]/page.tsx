@@ -19,7 +19,7 @@ import ShareButton from "@/components/ShareButton";
 import ShortLinks from "@/components/ShortLinks";
 import PopularLeaderboard from "@/components/PopularLeaderboard";
 import ReportButton from "@/components/ReportButton";
-import { useAnimeById, useAnimeEpisodes, useAnimeRecommendations } from "@/hooks/useAnime";
+import { useAnimeById, useAnimeEpisodes, useAnimeRecommendations, useAllAnimeEpisodes } from "@/hooks/useAnime";
 import { getDisplayTitle } from "@/lib/jikan";
 import { parseSlugId, makeAnimeSlug } from "@/lib/slug";
 import { useWatchHistory } from "@/hooks/useWatchHistory";
@@ -79,8 +79,9 @@ function WatchContent() {
   const { data: streams = [], isLoading: streamsLoading } = useEpisodeStreams(animeId, currentEp);
 
   const anime = animeData?.data;
-  const episodes = episodesData?.data || [];
-  const totalEps = anime?.episodes || episodes.length || 12;
+  const totalEps = anime?.episodes || episodesData?.data?.length || 12;
+  const { data: allEpisodes = [] } = useAllAnimeEpisodes(animeId, totalEps);
+  const episodes = allEpisodes.length > 0 ? allEpisodes : (episodesData?.data || []);
   const recommendations = recsData?.data?.slice(0, 12) || [];
   const slug = useMemo(() => (anime ? slugify(anime.title) : ""), [anime]);
 
@@ -314,9 +315,15 @@ function WatchContent() {
           </div>
           <ShortLinks malId={animeId} episode={currentEp} compact />
           <p className="mt-3 text-[11px] text-muted-foreground">
-            Links open on third-party shortener pages. We don't host or control these files.
+            Links open on third-party shortener pages. We don&apos;t host or control these files.
           </p>
         </section>
+
+        <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-center">
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            Support us so we can reduce or remove ads, popups, and banners to make the service better. Feel free!
+          </p>
+        </div>
 
         <section>
           <div className="flex items-center justify-between mb-3 gap-2">

@@ -6,24 +6,27 @@ import Layout from "@/components/Layout";
 const ADS = [
   {
     id: "pop",
-    name: "Popunder (tag.min.js)",
+    name: "Popunder",
     zone: "11226262",
     src: "https://nap5k.com/tag.min.js",
     desc: "Full-page popunder ad — opens in new tab on user click",
+    script: `(function(s){s.dataset.zone='11226262',s.src='https://nap5k.com/tag.min.js'})([document.documentElement,document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`,
   },
   {
     id: "vignette",
-    name: "Vignette (vignette.min.js)",
+    name: "Vignette",
     zone: "11227970",
     src: "https://n6wxm.com/vignette.min.js",
     desc: "Interstitial overlay — shows between page navigations",
+    script: `(function(s){s.dataset.zone='11227970',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement,document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`,
   },
   {
     id: "banner",
-    name: "Banner (tag.min.js)",
+    name: "Banner",
     zone: "11224691",
     src: "https://al5sm.com/tag.min.js",
     desc: "Display banner ad — injected into page content",
+    script: `(function(s){s.dataset.zone='11224691',s.src='https://al5sm.com/tag.min.js'})([document.documentElement,document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`,
   },
 ];
 
@@ -66,7 +69,7 @@ export default function AdTestPage() {
                   <h2 className="font-semibold text-sm">{ad.name}</h2>
                   <p className="text-xs text-muted-foreground">{ad.desc}</p>
                   <p className="text-[10px] text-muted-foreground mt-1 font-mono">
-                    Zone: {ad.zone} | Src: {ad.src}
+                    Zone: {ad.zone}
                   </p>
                 </div>
                 <button
@@ -81,6 +84,12 @@ export default function AdTestPage() {
                   {loaded[ad.id] ? "Loaded ✓" : "Load"}
                 </button>
               </div>
+              <details className="text-[10px] text-muted-foreground">
+                <summary className="cursor-pointer hover:text-foreground">View script</summary>
+                <code className="block mt-1 p-2 rounded bg-secondary font-mono break-all whitespace-pre-wrap">
+                  {ad.script}
+                </code>
+              </details>
             </div>
           ))}
         </div>

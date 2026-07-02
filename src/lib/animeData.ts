@@ -107,6 +107,20 @@ export async function getEpisodesTrio(id: number, page = 1): Promise<EpisodesRes
   return { data: [], source: "none" };
 }
 
+export async function fetchAllEpisodes(id: number, totalEps: number): Promise<JikanEpisode[]> {
+  if (totalEps <= 0) return [];
+  const all: JikanEpisode[] = [];
+  const totalPages = Math.ceil(totalEps / PAGE);
+  for (let p = 1; p <= totalPages; p++) {
+    try {
+      const result = await getEpisodesTrio(id, p);
+      if (result.data.length) all.push(...result.data);
+      if (result.data.length < PAGE) break;
+    } catch {}
+  }
+  return all;
+}
+
 async function enrichSubDub(id: number, episodes: JikanEpisode[]): Promise<JikanEpisode[]> {
   try {
     const streams = await fetchStreams(id);

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import * as anilist from "@/lib/anilist";
 import * as jikan from "@/lib/jikan";
-import { getEpisodesTrio } from "@/lib/animeData";
+import { getEpisodesTrio, fetchAllEpisodes } from "@/lib/animeData";
 
 export function useTopAnime(
   filter: "airing" | "upcoming" | "bypopularity" | "favorite" | "" = "",
@@ -83,6 +83,16 @@ export function useAnimeEpisodes(id: number, page = 1) {
     staleTime: 10 * 60 * 1000,
     enabled: !!id,
     retry: 2,
+  });
+}
+
+export function useAllAnimeEpisodes(id: number, totalEps: number) {
+  return useQuery({
+    queryKey: ["anime-all-episodes", id, totalEps],
+    queryFn: () => fetchAllEpisodes(id, totalEps),
+    staleTime: 30 * 60 * 1000,
+    enabled: !!id && totalEps > 0,
+    retry: 1,
   });
 }
 
