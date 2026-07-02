@@ -107,16 +107,19 @@ export async function getEpisodesTrio(id: number, page = 1): Promise<EpisodesRes
   return { data: [], source: "none" };
 }
 
-export async function fetchAllEpisodes(id: number, totalEps: number): Promise<JikanEpisode[]> {
-  if (totalEps <= 0) return [];
+export async function fetchAllEpisodes(id: number): Promise<JikanEpisode[]> {
   const all: JikanEpisode[] = [];
-  const totalPages = Math.ceil(totalEps / PAGE);
-  for (let p = 1; p <= totalPages; p++) {
+  let page = 1;
+  while (true) {
     try {
-      const result = await getEpisodesTrio(id, p);
-      if (result.data.length) all.push(...result.data);
-      if (result.data.length < PAGE) break;
-    } catch {}
+      const result = await getEpisodesTrio(id, page);
+      if (!result.data.length) break;
+      all.push(...result.data);
+      if (!result.pagination?.has_next_page) break;
+      page++;
+    } catch {
+      break;
+    }
   }
   return all;
 }

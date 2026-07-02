@@ -86,12 +86,12 @@ export function useAnimeEpisodes(id: number, page = 1) {
   });
 }
 
-export function useAllAnimeEpisodes(id: number, totalEps: number) {
+export function useAllAnimeEpisodes(id: number) {
   return useQuery({
-    queryKey: ["anime-all-episodes", id, totalEps],
-    queryFn: () => fetchAllEpisodes(id, totalEps),
+    queryKey: ["anime-all-episodes", id],
+    queryFn: () => fetchAllEpisodes(id),
     staleTime: 30 * 60 * 1000,
-    enabled: !!id && totalEps > 0,
+    enabled: !!id,
     retry: 1,
   });
 }

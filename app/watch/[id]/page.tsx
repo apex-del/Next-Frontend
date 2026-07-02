@@ -79,9 +79,9 @@ function WatchContent() {
   const { data: streams = [], isLoading: streamsLoading } = useEpisodeStreams(animeId, currentEp);
 
   const anime = animeData?.data;
-  const totalEps = anime?.episodes || episodesData?.data?.length || 12;
-  const { data: allEpisodes = [] } = useAllAnimeEpisodes(animeId, totalEps);
+  const { data: allEpisodes = [] } = useAllAnimeEpisodes(animeId);
   const episodes = allEpisodes.length > 0 ? allEpisodes : (episodesData?.data || []);
+  const totalEps = anime?.episodes || allEpisodes.length || episodesData?.data?.length || 12;
   const recommendations = recsData?.data?.slice(0, 12) || [];
   const slug = useMemo(() => (anime ? slugify(anime.title) : ""), [anime]);
 
@@ -318,12 +318,6 @@ function WatchContent() {
             Links open on third-party shortener pages. We don&apos;t host or control these files.
           </p>
         </section>
-
-        <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-center">
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            Support us so we can reduce or remove ads, popups, and banners to make the service better. Feel free!
-          </p>
-        </div>
 
         <section>
           <div className="flex items-center justify-between mb-3 gap-2">
