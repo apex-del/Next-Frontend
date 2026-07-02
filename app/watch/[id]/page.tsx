@@ -283,7 +283,7 @@ function WatchContent() {
               ) : (
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <AlertCircle className="h-3.5 w-3.5" />
-                  No {audio.toUpperCase()} servers available yet.
+                  No {audio.toUpperCase()} servers available for this episode yet.
                 </div>
               )}
             </div>
@@ -291,7 +291,7 @@ function WatchContent() {
           {activeStream && (
             <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-secondary/40 px-3 py-2">
               <p className="text-[11px] sm:text-xs text-muted-foreground">
-                If one player fails, try other servers. Anikoto servers are available when our own servers aren't ready.
+                If one player fails, try other servers.
               </p>
               <div className="flex items-center gap-1.5">
                 <ReportButton animeId={animeId} animeTitle={getDisplayTitle(anime)} episodeNumber={currentEp} />

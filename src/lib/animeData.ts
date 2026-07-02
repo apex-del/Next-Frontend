@@ -1,5 +1,6 @@
 import {
   getAnimeRecommendations as jikanRecs,
+  getAnimeEpisodes as jikanEpisodes,
   type JikanEpisode,
   type JikanAnime,
 } from "./jikan";
@@ -18,6 +19,7 @@ export interface EpisodesResult {
 const PAGE = 100;
 
 export async function getEpisodesTrio(id: number, page = 1): Promise<EpisodesResult> {
+  // Source 1: DB (OKKUP → FZR)
   try {
     const ext = await fetchExtEpisodes(id);
     if (ext.length) {
@@ -45,36 +47,35 @@ export async function getEpisodesTrio(id: number, page = 1): Promise<EpisodesRes
     }
   } catch {}
 
+  // Source 2: AniList — only use if it has a known total episode count
   try {
     const media = await getAniListMedia(id);
-    if (media) {
-      let mapped: JikanEpisode[] = [];
+    if (media?.episodes && media.episodes > 0) {
+      const mapped: JikanEpisode[] = Array.from({ length: media.episodes }, (_, i) => ({
+        mal_id: i + 1,
+        title: `Episode ${i + 1}`,
+        title_japanese: null,
+        title_romanji: null,
+        aired: null,
+        score: null,
+        filler: false,
+        recap: false,
+        forum_url: null,
+        thumbnail: null,
+      }));
+      // Enrich with streaming episode titles/thumbnails if available
       if (media.streamingEpisodes?.length) {
-        mapped = media.streamingEpisodes.map((e, i) => ({
-          mal_id: i + 1,
-          title: e.title || `Episode ${i + 1}`,
-          title_japanese: null,
-          title_romanji: null,
-          aired: null,
-          score: null,
-          filler: false,
-          recap: false,
-          forum_url: null,
-          thumbnail: e.thumbnail,
-        }));
-      } else if (media.episodes) {
-        mapped = Array.from({ length: media.episodes }, (_, i) => ({
-          mal_id: i + 1,
-          title: `Episode ${i + 1}`,
-          title_japanese: null,
-          title_romanji: null,
-          aired: null,
-          score: null,
-          filler: false,
-          recap: false,
-          forum_url: null,
-          thumbnail: null,
-        }));
+        for (const se of media.streamingEpisodes) {
+          const title = se.title || "";
+          const match = title.match(/Episode\s+(\d+)/i);
+          if (match) {
+            const epNum = parseInt(match[1]);
+            if (epNum >= 1 && epNum <= mapped.length) {
+              mapped[epNum - 1].title = title.replace(/^Episode\s+\d+\s*[-–]\s*/i, "") || title;
+              mapped[epNum - 1].thumbnail = se.thumbnail;
+            }
+          }
+        }
       }
       if (mapped.length) {
         const start = (page - 1) * PAGE;
@@ -87,6 +88,19 @@ export async function getEpisodesTrio(id: number, page = 1): Promise<EpisodesRes
           source: "anilist",
         };
       }
+    }
+  } catch {}
+
+  // Source 3: Jikan API — full episode list with pagination (100 eps/page)
+  try {
+    const jkRes = await jikanEpisodes(id, page);
+    if (jkRes?.data?.length) {
+      const enriched = await enrichSubDub(id, jkRes.data);
+      return {
+        data: enriched,
+        pagination: jkRes.pagination,
+        source: "jikan",
+      };
     }
   } catch {}
 
